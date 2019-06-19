@@ -55,9 +55,11 @@ extern uint16_t UTIL_getCommStatus(void);
 extern void UTIL_setNotifyFlagMcu(uint16_t status);
 #endif
 
-extern int UTIL_controlLed(int type, int on_off);
-extern void UTIL_testbit(int on_off);
-extern void UTIL_testbitG(int on_off);
+extern int UTIL_controlLed(int on_off);
+extern void UTIL_testLED(int on_off);
+
+extern void UTIL_testbit0(int on_off);
+extern void UTIL_testbit1(int on_off);
 //*****************************************************************************
 //
 // Mark the end of the C bindings section for C++ compilers.

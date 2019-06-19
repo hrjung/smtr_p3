@@ -1432,9 +1432,10 @@ void main(void)
   FW_setMinMax(fwHandle,_IQ(USER_MAX_NEGATIVE_ID_REF_CURRENT_A/USER_IQ_FULL_SCALE_CURRENT_A),_IQ(0.0));
 #endif
 
+#ifndef SUPPORT_HW_COMMON
   // setup faults
   HAL_setupFaults(halHandle);
-
+#endif
 
   // initialize the interrupt vector table
   HAL_initIntVectorTable(halHandle);

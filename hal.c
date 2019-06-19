@@ -619,9 +619,12 @@ void HAL_setupFaults(HAL_Handle handle)
       PWM_setTripZoneState_TZA(obj->pwmHandle[cnt],PWM_TripZoneState_EPWM_Low);
       PWM_setTripZoneState_TZB(obj->pwmHandle[cnt],PWM_TripZoneState_EPWM_Low);
 #endif
+
+#ifndef SUPPORT_HW_COMMON
       // Clear faults from flip flop
       GPIO_setLow(obj->gpioHandle,GPIO_Number_9);
       GPIO_setHigh(obj->gpioHandle,GPIO_Number_9);
+#endif
     }
 
   return;
@@ -1311,8 +1314,19 @@ void HAL_setupGpios(HAL_Handle handle)
 
   // not used
   GPIO_setMode(obj->gpioHandle,GPIO_Number_25,GPIO_25_Mode_GeneralPurpose);
+#ifdef SUPPORT_P3_HW
+  // test pin 0, 1
+  GPIO_setMode(obj->gpioHandle,GPIO_Number_26,GPIO_26_Mode_GeneralPurpose);
+  GPIO_setLow(obj->gpioHandle,GPIO_Number_26);
+  GPIO_setDirection(obj->gpioHandle,GPIO_Number_26,GPIO_Direction_Output);
+
+  GPIO_setMode(obj->gpioHandle,GPIO_Number_27,GPIO_27_Mode_GeneralPurpose);
+  GPIO_setLow(obj->gpioHandle,GPIO_Number_27);
+  GPIO_setDirection(obj->gpioHandle,GPIO_Number_27,GPIO_Direction_Output);
+#else
   GPIO_setMode(obj->gpioHandle,GPIO_Number_26,GPIO_26_Mode_GeneralPurpose);
   GPIO_setMode(obj->gpioHandle,GPIO_Number_27,GPIO_27_Mode_GeneralPurpose);
+#endif
 
 #ifdef SUPPORT_EASYDSP_DEBUG
   GPIO_setPullup(obj->gpioHandle, GPIO_Number_28, GPIO_Pullup_Enable);

@@ -114,41 +114,36 @@ void UTIL_setNotifyFlagMcu(uint16_t status)
 }
 #endif
 
-int UTIL_controlLed(int type, int on_off)
+int UTIL_controlLed(int on_off)
 {
-	int result = 0;
+    UTIL_testLED(on_off);
 
-	if(type == HAL_Gpio_LED_R || type == HAL_Gpio_LED_G)
-	{
-		if(on_off == 1)
-			HAL_setGpioHigh(halHandle,(GPIO_Number_e)type);
-		else
-			HAL_setGpioLow(halHandle,(GPIO_Number_e)type);
-	}
-	else
-	{
-		UARTprintf("Error : no LED type=%d \n", type);
-		result = 1;
-	}
-
-	return result;
+    return 1;
 }
 
 // TODO : debug purpose only, using LED_R2 as test bit
-void UTIL_testbit(int on_off) // LD2
-{
-	if(on_off == 1)
-		HAL_setGpioHigh(halHandle,(GPIO_Number_e)HAL_Gpio_LED_R);
-	else
-		HAL_setGpioLow(halHandle,(GPIO_Number_e)HAL_Gpio_LED_R);
-}
-
-void UTIL_testbitG(int on_off) // LD1
+void UTIL_testLED(int on_off)
 {
 	if(on_off == 1)
 		HAL_setGpioHigh(halHandle,(GPIO_Number_e)HAL_Gpio_LED_G);
 	else
 		HAL_setGpioLow(halHandle,(GPIO_Number_e)HAL_Gpio_LED_G);
+}
+
+void UTIL_testbit0(int on_off) // test bit 0
+{
+    if(on_off == 1)
+        HAL_setGpioHigh(halHandle,(GPIO_Number_e)HAL_Gpio_Test0);
+    else
+        HAL_setGpioLow(halHandle,(GPIO_Number_e)HAL_Gpio_Test0);
+}
+
+void UTIL_testbit1(int on_off) // test bit 1
+{
+    if(on_off == 1)
+        HAL_setGpioHigh(halHandle,(GPIO_Number_e)HAL_Gpio_Test1);
+    else
+        HAL_setGpioLow(halHandle,(GPIO_Number_e)HAL_Gpio_Test1);
 }
 
 //*****************************************************************************

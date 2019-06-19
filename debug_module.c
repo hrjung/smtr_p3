@@ -1597,26 +1597,22 @@ sbrk_err:
 STATIC int dbg_setLed(int argc, char *argv[])
 {
 	int type, on_off;
-	int led_type[] = {HAL_Gpio_LED_R, HAL_Gpio_LED_G};
-	char *led_str[] = {"LED_R", "LED_G"};
 
-    if(argc != 3) goto led_err;
+    if(argc != 2) goto led_err;
 
-    type = atoi(argv[1]);
-    on_off = atoi(argv[2]);
+    on_off = atoi(argv[1]);
 
-    if(type < 0 || type > 1) goto led_err;
 	if(on_off != 0 && on_off != 1) goto led_err;
 
 	if(on_off == 1) //LED on
 	{
-		UTIL_controlLed(led_type[type], on_off);
-		UARTprintf(" %s on\n", led_str[type]);
+		UTIL_controlLed(on_off);
+		UARTprintf(" LED G on\n");
     }
     else
     {
-		UTIL_controlLed(led_type[type], on_off);
-		UARTprintf(" %s off\n", led_str[type]);
+		UTIL_controlLed(on_off);
+		UARTprintf(" LED G off\n");
     }
 
     return 0;
