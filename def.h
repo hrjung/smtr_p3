@@ -76,7 +76,7 @@
 // support constant PWM duty test
 #define PWM_DUTY_TEST
 
-#define SUPPORT_EASYDSP_DEBUG
+//#define SUPPORT_EASYDSP_DEBUG
 
 // enable for unit test only
 #define UNIT_TEST_ENABLED

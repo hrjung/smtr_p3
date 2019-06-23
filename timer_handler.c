@@ -301,7 +301,7 @@ interrupt void timer0ISR(void)
 		if(gTimerCount%1000 == 0)
 		{
 #ifdef SUPPORT_P3_HW
-		    HAL_toggleGpio(halHandle,(GPIO_Number_e)HAL_Gpio_Test0);
+			HAL_toggleGpio(halHandle,(GPIO_Number_e)HAL_Gpio_Test0);
 #else
 			HAL_toggleLed(halHandle,(GPIO_Number_e)HAL_Gpio_LED3);
 #endif

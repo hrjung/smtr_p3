@@ -93,6 +93,7 @@
 #include "easy2806x_v8.h"
 #endif
 
+
 // **************************************************************************
 // the defines
 
@@ -358,6 +359,8 @@ extern uint16_t gOffsetMeasureFlag;
 #ifdef SUPPORT_DIRECTION_STATUS
 extern float_t dir_freq;
 #endif
+
+
 
 
 #ifdef SUPPORT_AUTO_LOAD_TEST
@@ -1434,7 +1437,7 @@ void main(void)
 
 #ifndef SUPPORT_HW_COMMON
   // setup faults
-  HAL_setupFaults(halHandle);
+  HAL_setupFaults(halHandle); // not used
 #endif
 
   // initialize the interrupt vector table
@@ -1448,11 +1451,6 @@ void main(void)
   // set GPIO31 to XINT1 for FAULT_IPM
   SetGpioInterrupt();
 //#endif
-
-#ifndef SUPPORT_EASYDSP_DEBUG
-  // enable the SCI interrupts
-  UARTStdioInit(halHandle, SCI_B); // SCI_A -> SCI_B for SUPPORT_P3_HW
-#endif
 
   //initialize timer variable
   TMR_init();
@@ -1563,6 +1561,10 @@ void main(void)
   easyDSP_SCI_Init();
 #endif
 
+#ifdef SUPPORT_P3_HW
+  UARTStdioInit(halHandle, SCI_B); // SCI_A -> SCI_B for SUPPORT_P3_HW
+#endif
+
   // enable DC bus compensation
   CTRL_setFlag_enableDcBusComp(ctrlHandle, true);
 
@@ -1626,7 +1628,7 @@ void main(void)
         //TODO : should find correct location
         state_param.inv = STA_control();
 
-#ifndef SUPPORT_EASYDSP_DEBUG
+#ifdef SUPPORT_P3_HW
         //debug command during Motor stop
         ProcessDebugCommand();
 #endif
@@ -1951,7 +1953,7 @@ void main(void)
         //TODO : should find correct location
         state_param.inv = STA_control();
 
-#ifndef SUPPORT_EASYDSP_DEBUG
+#ifdef SUPPORT_P3_HW
         // debug command in Motor running
         ProcessDebugCommand();
 #endif

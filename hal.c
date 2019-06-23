@@ -735,7 +735,7 @@ HAL_Handle HAL_init(void *pMemory,const size_t numBytes)
   obj->sciBHandle = SCI_init((void*)SCIB_BASE_ADDR, sizeof(SCI_Obj)); // used in SUPPORT_P3_HW
 
   obj->spiAHandle = SPI_init((void*)SPIA_BASE_ADDR, sizeof(SPI_Obj)); //slave
-  //obj->spiBHandle = SPI_init((void*)SPIB_BASE_ADDR, sizeof(SPI_Obj)); // no use in SUPPORT_P3_HW
+  //obj->spiBHandle = SPI_init((void*)SPIB_BASE_ADDR, sizeof(SPI_Obj)); //master
 
   obj->pwmUserHandle = PWM_init((void *)PWM_ePWM7_BASE_ADDR,sizeof(PWM_Obj));
 
@@ -1843,9 +1843,12 @@ void HAL_setupPeripheralClks(HAL_Handle handle)
   CLK_disableClaClock(obj->clkHandle);
 
   CLK_enableSciaClock(obj->clkHandle);
+#ifdef SUPPORT_P3_HW
+  CLK_enableScibClock(obj->clkHandle);
+#endif
 #ifdef SUPPORT_V08_HW
   CLK_enableSpiaClock(obj->clkHandle);
-  CLK_enableSpibClock(obj->clkHandle);
+  //CLK_enableSpibClock(obj->clkHandle);
 #else
 #ifdef SUPPORT_V0_HW
   CLK_enableScibClock(obj->clkHandle);

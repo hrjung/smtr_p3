@@ -54,7 +54,7 @@ const float_t pwm_tbl[4] = { 4.0, 8.0, 12.0, 16.0 };
 //extern HAL_Handle halHandle;
 //extern USER_Params gUserParams;
 
-uint16_t vf_foc_control = FOC_CONTROL;
+uint16_t vf_foc_control = VF_CONTROL; //FOC_CONTROL
 
 /*******************************************************************************
  * EXTERNS
