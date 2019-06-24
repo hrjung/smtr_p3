@@ -78,7 +78,7 @@ typedef enum {
 	DBG_CMD_SET_JUMP_FREQ,
 	DBG_CMD_SET_ACCEL_TIME,
 	DBG_CMD_SET_ENERGY_SAVE,
-	DBG_CMD_SET_V_BOOST,
+	//DBG_CMD_SET_V_BOOST,
 
 	DBG_CMD_MAIN_CONTROL,
 
@@ -549,21 +549,22 @@ STATIC void dbg_showTripData(void)
 	ERR_printTripInfo();
 }
 
-extern _iq gVbus_lpf;
+//extern _iq gVbus_lpf;
 STATIC void dbg_showMonitorParam(void)
 {
 	UARTprintf(" Inverter Status display\n");
 
-	float_t gOver = _IQtoF(_IQdiv(_IQ(1.0),gVbus_lpf));
-	UARTprintf("\t Iu: %f, Iv: %f, Iw: %f, DC voltage: %f\n", MAIN_getIu(), MAIN_getIv(), MAIN_getIw(), MAIN_getVdcBus());
+//	float_t gOver = _IQtoF(_IQdiv(_IQ(1.0),gVbus_lpf));
+
+	UARTprintf("\t Iu: %f, Iv: %f, Iw: %f, DC_V: %f\n", MAIN_getIu(), MAIN_getIv(), MAIN_getIw(), MAIN_getVdcBus());
 	UARTprintf("\t RMS Iu: %f, Iv: %f, Iw: %f, Iave: %f \n", internal_status.Irms[0], internal_status.Irms[1], internal_status.Irms[2], m_status.current);
-	UARTprintf("\t RMS Vu: %f, Vv: %f, Vw: %f\n", internal_status.Vrms[0], internal_status.Vrms[1], internal_status.Vrms[2]);
-	UARTprintf("\t RMS Vppu: %f, Vppv: %f, Vppw: %f\n", (float)internal_status.Vpprms[0], (float)internal_status.Vpprms[1], (float)internal_status.Vpprms[2]);
+//	UARTprintf("\t RMS Vu: %f, Vv: %f, Vw: %f\n", internal_status.Vrms[0], internal_status.Vrms[1], internal_status.Vrms[2]);
+//	UARTprintf("\t RMS Vppu: %f, Vppv: %f, Vppw: %f\n", (float)internal_status.Vpprms[0], (float)internal_status.Vpprms[1], (float)internal_status.Vpprms[2]);
 //	UARTprintf("\t Volt: Vu: %f, Vv: %f, Vw: %f \n", internal_status.Vu_inst, internal_status.Vv_inst, internal_status.Vw_inst); //, MAIN_getDC_lfp());
 //	UARTprintf("\t Volt: U-V: %f, V-W: %f, W-U: %f \n", (internal_status.Vu_inst - internal_status.Vv_inst), (internal_status.Vv_inst-internal_status.Vw_inst), (internal_status.Vw_inst-internal_status.Vu_inst));
-//	UARTprintf("\t input status: 0x%x, out status: 0x%x\n", (int)((mnt.dio_status>>16)&0x0F), (int)(mnt.dio_status&0x0F));
 	UARTprintf("\t Motor RPM: %f  Freq: %f,  target %f, dir=%d \n", STA_getCurSpeed(), m_status.cur_freq, m_status.target_freq, (int)m_status.direction);
-	UARTprintf("\t Motor status %d, accel: %f  decel: %f gOver=%f \n", m_status.status, m_status.acc_res, m_status.dec_res, gOver);
+	UARTprintf("\t Motor status %d, accel: %f  decel: %f \n", m_status.status, m_status.acc_res, m_status.dec_res);
+//	UARTprintf("\t Motor status %d, accel: %f  decel: %f gOver=%f \n", m_status.status, m_status.acc_res, m_status.dec_res, gOver);
 }
 
 STATIC void dbg_showOverloadParam(void)
@@ -1596,7 +1597,7 @@ sbrk_err:
 
 STATIC int dbg_setLed(int argc, char *argv[])
 {
-	int type, on_off;
+	int on_off;
 
     if(argc != 2) goto led_err;
 
@@ -1988,7 +1989,7 @@ extern void dbg_disableSystem(void);
 
 STATIC int dbg_tmpTest(int argc, char *argv[])
 {
-	int i, s_value, index;
+	int index;
 //	int value;
 //	_iq iq_val;
 //	float f_val;
@@ -2001,11 +2002,13 @@ STATIC int dbg_tmpTest(int argc, char *argv[])
 
     if(index == '0')
     {
-        for(i=0; i<400; i+=30)
-        {
-        	s_value = FREQ_convertToSpeed(i);
-        	UARTprintf("value = freq=%d -> rpm=%d\n", i, s_value);
-        }
+//      int i, s_value;
+//        for(i=0; i<400; i+=30)
+//        {
+//        	s_value = FREQ_convertToSpeed(i);
+//        	UARTprintf("value = freq=%d -> rpm=%d\n", i, s_value);
+//        }
+        //UARTprintf("WR =%d, RD==%d\n", g_ulUARTTxWriteIndex, g_ulUARTTxReadIndex);
     }
     else if(index == 1)
     {

@@ -154,11 +154,11 @@ static tBoolean
 IsBufferFull(volatile unsigned long *pulRead,
              volatile unsigned long *pulWrite, unsigned long ulSize)
 {
-    unsigned long ulWrite;
-    unsigned long ulRead;
+    unsigned long ulWrite = *pulWrite;
+    unsigned long ulRead = *pulRead;
 
-    ulWrite = *pulWrite;
-    ulRead = *pulRead;
+//    ulWrite = *pulWrite;
+//    ulRead = *pulRead;
 
     return((((ulWrite + 1) % ulSize) == ulRead) ? true : false);
 }
@@ -185,11 +185,11 @@ static tBoolean
 IsBufferEmpty(volatile unsigned long *pulRead,
               volatile unsigned long *pulWrite)
 {
-    unsigned long ulWrite;
-    unsigned long ulRead;
+    unsigned long ulWrite = *pulWrite;
+    unsigned long ulRead = *pulRead;
 
-    ulWrite = *pulWrite;
-    ulRead = *pulRead;
+//    ulWrite = *pulWrite;
+//    ulRead = *pulRead;
 
     return((ulWrite  == ulRead) ? true : false);
 }
@@ -216,11 +216,11 @@ static unsigned long
 GetBufferCount(volatile unsigned long *pulRead,
                volatile unsigned long *pulWrite, unsigned long ulSize)
 {
-    unsigned long ulWrite;
-    unsigned long ulRead;
+    unsigned long ulWrite = *pulWrite;
+    unsigned long ulRead = *pulRead;
 
-    ulWrite = *pulWrite;
-    ulRead = *pulRead;
+//    ulWrite = *pulWrite;
+//    ulRead = *pulRead;
 
     return((ulWrite >= ulRead) ? (ulWrite - ulRead) :
                                  (ulSize - (ulRead - ulWrite)));
@@ -248,8 +248,7 @@ UARTPrimeTransmit(SCI_Handle sciHandle)
         // them to the UART transmit FIFO.
         while(UARTSpaceAvail(sciHandle) && !TX_BUFFER_EMPTY)
         {
-            UARTCharPutNonBlocking(sciHandle,
-                                       g_pcUARTTxBuffer[g_ulUARTTxReadIndex]);
+            UARTCharPutNonBlocking(sciHandle, g_pcUARTTxBuffer[g_ulUARTTxReadIndex]);
             ADVANCE_TX_BUFFER_INDEX(g_ulUARTTxReadIndex);
         }
 
@@ -608,9 +607,6 @@ UARTprintf(char *pcString, ...)
     char *fStr;
 #endif
 
-#ifdef SUPPORT_EASYDSP_DEBUG
-    return;
-#endif
 
     va_start(vaArgP, pcString);
 

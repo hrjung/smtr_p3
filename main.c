@@ -2362,15 +2362,11 @@ interrupt void mainISR(void)
 		dbg_getSample(internal_status.Iu_inst, internal_status.Iv_inst, internal_status.Iw_inst);
 #endif
 
-#ifdef SUPPORT_MISS_PHASE_DETECT
+#ifdef SUPPORT_MISS_PHASE_DETECT_
 	  if(MAIN_isSystemEnabled())
 		  MAIN_checkMissPhase(internal_status.Iu_inst, internal_status.Iv_inst, internal_status.Iw_inst);
 #endif
 
-//	  if(miss_count > 20)
-//		  MAIN_isMissingIphase();
-//	  else
-//		  miss_count++;
 
   }
   //UTIL_testbit(0);

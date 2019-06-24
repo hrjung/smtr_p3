@@ -76,13 +76,13 @@
 // support constant PWM duty test
 #define PWM_DUTY_TEST
 
-//#define SUPPORT_EASYDSP_DEBUG
+#define SUPPORT_EASYDSP_DEBUG
 
 // enable for unit test only
 #define UNIT_TEST_ENABLED
 #ifdef UNIT_TEST_ENABLED
-//#undef SAMPLE_ADC_VALUE
-#define SAMPLE_ADC_VALUE
+#undef SAMPLE_ADC_VALUE
+//#define SAMPLE_ADC_VALUE
 #define STATIC
 #else
 #define STATIC static
