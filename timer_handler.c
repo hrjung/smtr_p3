@@ -80,6 +80,10 @@ extern int TEMP_monitorTemperature(void);
 
 uint16_t wd_count=0;
 
+#ifdef SUPPORT_AUTO_LOAD_TEST
+extern void test_startRun(void);
+#endif
+
 #ifdef SUPPORT_MISS_PHASE_DETECT
 uint16_t miss_in_phase_cnt=0;
 #endif
@@ -317,7 +321,7 @@ interrupt void timer0ISR(void)
 		HAL_kickWdog(halHandle);
 #endif
 
-#if 0 // only for test without debug connection
+#if 1 // only for test without debug connection
 	if(internal_status.relay_enabled)
 	{
 		static uint32_t test_start=0, test_duration=0;
@@ -331,14 +335,19 @@ interrupt void timer0ISR(void)
 		{
 			if(freq_set == 0)
 			{
+#ifdef SUPPORT_AUTO_LOAD_TEST
+			    test_startRun();
+			    freq_set = 1;
+#else
 				//set frequency
-				FREQ_setFreqValue(40.0);
+				FREQ_setFreqValue(60.0);
 				// start
 				MAIN_enableSystem();
 				STA_calcResolution();
 				freq_set = 1;
 				test_duration = secCnt;
-				UARTprintf("set freq 40Hz at %f\n", (float_t)(secCnt/10.0));
+				UARTprintf("set freq 60Hz at %f\n", (float_t)(secCnt/10.0));
+#endif
 			}
 
 #if 0 // no stop for impulse test

@@ -379,11 +379,18 @@ enum {
 //#define AL_TEST_REVERSE_TIME        (400)
 
 // 3rd no inertial test at Samyang
+//#define AL_TEST_WORKING_FREQ        (60.0)
+//#define AL_TEST_ACCEL_TIME          (10.0)
+//#define AL_TEST_DECEL_TIME          (10.0)
+//#define AL_TEST_RUNNING_TIME        (100)
+//#define AL_TEST_REVERSE_TIME        (200)
+
+// internal cycle test at 4th floor
 #define AL_TEST_WORKING_FREQ        (60.0)
 #define AL_TEST_ACCEL_TIME          (10.0)
-#define AL_TEST_DECEL_TIME          (10.0)
+#define AL_TEST_DECEL_TIME          (30.0)
 #define AL_TEST_RUNNING_TIME        (100)
-#define AL_TEST_REVERSE_TIME        (200)
+#define AL_TEST_REVERSE_TIME        (400)
 
 int load_test_type=1;  // 0: FULL_LOAD_TEST, 1: AUTO_LOAD_TEST
 int AL_test_stop_flag=0, AL_test_start_flag=0;
@@ -977,8 +984,6 @@ void MAIN_setDeviceConstant(void)
 	MPARAM_updateDevConst();
 
 	FREQ_updateJumpSpeed();
-
-	//MAIN_setRegenDuty(iparam[REGEN_RESISTANCE_INDEX].value.f, iparam[REGEN_POWER_INDEX].value.l);
 
 	// variable setting from parameter
 	if(iparam[DIRECTION_INDEX].value.l == 0)
@@ -2023,6 +2028,7 @@ interrupt void mainISR(void)
 #endif
   {
 #ifdef SUPPORT_HW_COMMON
+      if(!MAIN_isTripHappened())
 	    HAL_toggleLed(halHandle,(GPIO_Number_e)HAL_Gpio_LED_G);
 #else
 	    HAL_toggleLed(halHandle,(GPIO_Number_e)HAL_Gpio_LED2);
@@ -2931,6 +2937,23 @@ int TEST_readSwitch(void)
 		return 2; // ignore
 }
 
+void test_startRun(void)
+{
+    cmd_type_st que_data;
+
+    que_data.cmd = SPICMD_CTRL_RUN;
+    que_data.index = INV_RUN_STOP_CMD_INDEX;
+    que_data.data.l = 0;
+    if(!QUE_isFull())
+    {
+        QUE_putCmd(que_data);
+    }
+    else
+    {
+        UARTprintf("QUE_full !!\n");
+    }
+}
+
 void processAutoLoadTest(void)
 {
 	static int test_state=AL_TEST_READY, prev_test_state=AL_TEST_READY;
@@ -2981,7 +3004,7 @@ void processAutoLoadTest(void)
 			UARTprintf("start running motor, %f Hz\n", iparam[FREQ_VALUE_INDEX].value.f);
 			test_state = AL_TEST_CHECKING;
 			if(!MAIN_isTripHappened())
-				HAL_setGpioHigh(halHandle,(GPIO_Number_e)HAL_Gpio_LED_R);
+				HAL_setGpioHigh(halHandle,(GPIO_Number_e)HAL_Gpio_LED_G);
 		}
 		else
 		{
@@ -2991,7 +3014,7 @@ void processAutoLoadTest(void)
 			AL_test_start_flag=0;
 			AL_test_stop_flag=0;
 			if(!MAIN_isTripHappened())
-				HAL_setGpioLow(halHandle,(GPIO_Number_e)HAL_Gpio_LED_R);
+				HAL_setGpioLow(halHandle,(GPIO_Number_e)HAL_Gpio_LED_G);
 		}
 		break;
 

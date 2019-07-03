@@ -93,7 +93,7 @@ extern uint16_t gOffsetMeasureFlag;
 #endif
 
 static int evt_flag=0;
-int regen_duty=70; //default
+int regen_duty=30; //default
 
 uint16_t ud_volt_count=0, ov_volt_count=0;
 
@@ -406,6 +406,7 @@ int REGEN_setRegenDuty(uint32_t value)
 	if(value > 100) return 1;
 
 	iparam[REGEN_DUTY_INDEX].value.l = value;
+	regen_duty = (int)value;
 
 	return 0;
 }
@@ -516,7 +517,7 @@ int REGEN_process(float_t dc_volt)
 	else
 		ov_volt_count=0;
 
-	if(dc_volt > protect_dc.dc_volt_start_regen_level) //dev_const.regen_limit + param.protect.regen.band)
+	if(dc_volt > protect_dc.dc_volt_start_regen_level)
 	{
 		REGEN_active(dc_volt);
 		if(regen_flag==0)
@@ -529,7 +530,7 @@ int REGEN_process(float_t dc_volt)
 
 	if(REGEN_isEnabled())
 	{
-		if(dc_volt < protect_dc.dc_volt_end_regen_level) //dev_const.regen_limit)
+		if(dc_volt < protect_dc.dc_volt_end_regen_level)
 		{
 			UARTprintf("REGEN_end() DC=%f, duty=%d \n", dc_volt, regen_duty);
 			REGEN_end();
@@ -655,7 +656,7 @@ void PROT_init(int input)
 		trip_info.V_input = input;
 		ERR_setTripFlag(TRIP_REASON_INPUT_VOLT_ERR);
 	}
-
+	regen_duty = (int)iparam[REGEN_DUTY_INDEX].value.l;
 }
 
 int processProtection(void)
