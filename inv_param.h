@@ -339,7 +339,7 @@ extern uint16_t UTIL_setPwmDuty(int duty);
 
 extern uint16_t UTIL_setRegenPwmDuty(int duty);
 extern float_t UTIL_readIpmTemperature(void);
-extern float_t UTIL_readMotorTemperature(void);
+//extern uint16_t UTIL_readMotorTemperature(void);
 
 
 inline int MAIN_isTripHappened(void)

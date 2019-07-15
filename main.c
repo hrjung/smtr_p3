@@ -2891,23 +2891,54 @@ uint16_t UTIL_setRegenPwmDuty(int duty)
 	return user_pwm;
 }
 
+uint16_t ipm_temp_val[TEMPERATURE_SAMPLE_CNT];
 float_t UTIL_readIpmTemperature(void)
 {
+    static int ipm_idx=0;
+    int i;
+    uint32_t ipm_sum=0;
+    uint16_t ipm_ave_value=0;
+
+    // read DI
+    ipm_idx = ipm_idx%TEMPERATURE_SAMPLE_CNT;
+    ipm_temp_val[ipm_idx] = internal_status.ipm_temp;
+    ipm_idx++;
+
+    ipm_sum=0;
+    for(i=0; i<TEMPERATURE_SAMPLE_CNT; i++) ipm_sum += ipm_temp_val[i];
+    ipm_ave_value = (uint16_t)(ipm_sum/TEMPERATURE_SAMPLE_CNT);
+
+
 	//return ((float_t)internal_status.ipm_temp * 0.0328 - 13.261);
-	return ((float_t)internal_status.ipm_temp * 0.0319 - 19.757);
+	return ((float_t)ipm_ave_value * 0.0319 - 19.757);
 }
 
-float_t UTIL_readMotorTemperature(void)
+uint16_t mtr_temp_val[TEMPERATURE_SAMPLE_CNT];
+uint16_t UTIL_readMotorTemperature(void)
 {
-	return (float_t)40.0; //TODO : RTD
+    static int mtr_idx=0;
+    int i;
+    uint32_t mtr_sum=0;
+    uint16_t mtr_ave_value=0;
+
+    // read DI
+    mtr_idx = mtr_idx%TEMPERATURE_SAMPLE_CNT;
+    mtr_temp_val[mtr_idx] = internal_status.mtr_temp;
+    mtr_idx++;
+
+    mtr_sum=0;
+    for(i=0; i<TEMPERATURE_SAMPLE_CNT; i++) mtr_sum += mtr_temp_val[i];
+    mtr_ave_value = (uint16_t)(mtr_sum/TEMPERATURE_SAMPLE_CNT);
+
+    return mtr_ave_value ;
 }
 
 uint16_t UTIL_readMotorTemperatureStatus(void)
 {
-	float_t motor_temp = UTIL_readMotorTemperature();
-	if(motor_temp < MOTOR_TEMP_WARN_LEVEL)
+    uint16_t motor_temp = UTIL_readMotorTemperature();
+	if(motor_temp > MOTOR_TEMP_WARN_ADC_LEVEL)
 		return 0;
-	else if(motor_temp >= MOTOR_TEMP_WARN_LEVEL && motor_temp < MOTOR_TEMP_TRIP_LEVEL)
+	else if(motor_temp <= MOTOR_TEMP_WARN_ADC_LEVEL && motor_temp > MOTOR_TEMP_TRIP_ADC_LEVEL)
 		return 1;
 	else
 		return 2;

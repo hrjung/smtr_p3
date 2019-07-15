@@ -122,6 +122,8 @@ extern void MAIN_readCurrent(void);
 extern int MAIN_isOverCurrent(void);
 //extern void MAIN_setRegenDuty(float_t resist, uint32_t power);
 
+extern uint16_t UTIL_readMotorTemperatureStatus(void);
+
 /*
  *  ======== local function ========
  */
@@ -584,7 +586,8 @@ int TEMP_isFanOff(float_t ipm_temp)
 uint16_t ipm_count=0, mtr_count=0;
 int TEMP_monitorTemperature(void)
 {
-	float_t ipm_temp, mtr_temp;
+	float_t ipm_temp;
+	uint16_t mtr_temp;
 	static int ipm_status=0, mtr_status=0;
 
 	ipm_temp = UTIL_readIpmTemperature();
@@ -614,16 +617,17 @@ int TEMP_monitorTemperature(void)
 	else
 		ipm_count=0;
 
-	mtr_temp = UTIL_readMotorTemperature();
-	if(mtr_temp > MOTOR_TEMPERATURE_LIMIT)
+
+	mtr_temp = UTIL_readMotorTemperatureStatus();
+	if(mtr_temp == 2) // Motor temperature trip
 	{
 		ERR_setTripInfo();
 		trip_info.motor_temp = mtr_temp;
 		ERR_setTripFlag(TRIP_REASON_MTR_OVER_TEMP);
-		if(mtr_status == 0)
+		if(mtr_status != 2)
 		{
 			UARTprintf("Motor over temperature %f\n", mtr_temp);
-			mtr_status = 1;
+			mtr_status = 2;
 		}
 	}
 

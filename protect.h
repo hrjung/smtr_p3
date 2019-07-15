@@ -26,8 +26,10 @@
 //#define DC_VOLTAGE_END_REGEN_LEVEL 		(618.0)
 //#endif
 
-#define MOTOR_TEMP_WARN_LEVEL	100.0
-#define MOTOR_TEMP_TRIP_LEVEL	140.0
+#define MOTOR_TEMP_WARN_ADC_LEVEL	1930    // adc value for 10k
+#define MOTOR_TEMP_TRIP_ADC_LEVEL	350     // adc value for 100k
+
+#define TEMPERATURE_SAMPLE_CNT  10
 
 ////////////////////////////////////////////////
 
