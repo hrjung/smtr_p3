@@ -44,16 +44,18 @@ extern uint16_t comm_mcu_status;
 //
 //*****************************************************************************
 // for SUPPORT_P3_HW GPIO changed to active Low
+// set active than shaft brake released
+// set inactive than shaft brake locked
 void UTIL_setShaftBrake(void)
 {
-	internal_status.shaft_brake_enabled = 1;
-	HAL_setGpioLow(halHandle,(GPIO_Number_e)HAL_Gpio_Brake);
+	internal_status.shaft_brake_locked = 1;
+	HAL_setGpioHigh(halHandle,(GPIO_Number_e)HAL_Gpio_Brake);
 }
 
 void UTIL_releaseShaftBrake(void)
 {
-	internal_status.shaft_brake_enabled = 0;
-	HAL_setGpioHigh(halHandle,(GPIO_Number_e)HAL_Gpio_Brake);
+	internal_status.shaft_brake_locked = 0;
+	HAL_setGpioLow(halHandle,(GPIO_Number_e)HAL_Gpio_Brake);
 }
 
 void UTIL_setFanOn(void)

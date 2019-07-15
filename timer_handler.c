@@ -321,7 +321,7 @@ interrupt void timer0ISR(void)
 		HAL_kickWdog(halHandle);
 #endif
 
-#if 1 // only for test without debug connection
+#ifdef SUPPORT_AUTO_LOAD_TEST // only for test without debug connection
 	if(internal_status.relay_enabled)
 	{
 		static uint32_t test_start=0, test_duration=0;
@@ -335,7 +335,7 @@ interrupt void timer0ISR(void)
 		{
 			if(freq_set == 0)
 			{
-#ifdef SUPPORT_AUTO_LOAD_TEST
+#if 1
 			    test_startRun();
 			    freq_set = 1;
 #else

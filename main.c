@@ -1050,7 +1050,7 @@ void MAIN_setDeviceConstant(void)
 	internal_status.regen_enabled = 0;
 	internal_status.trip_happened = 0;
 	internal_status.fan_enabled = 0;
-	internal_status.shaft_brake_enabled = 0;
+	internal_status.shaft_brake_locked = 0;
 
 	internal_status.oc_count = 0;
 
@@ -1646,6 +1646,8 @@ void main(void)
   	    internal_status.Vdc_inst = _IQtoF(gAdcData.dcBus)*USER_IQ_FULL_SCALE_VOLTAGE_V;
   	    internal_status.ipm_temp = gAdcData.ipm_temperature;
   	    internal_status.mtr_temp = gAdcData.mtr_temperature;
+
+  	    PARAM_setInvStatus(); // update status in stop
 
 #ifdef SUPPORT_AUTO_LOAD_TEST
   	    if(load_test_type)
@@ -2368,7 +2370,7 @@ interrupt void mainISR(void)
 		dbg_getSample(internal_status.Iu_inst, internal_status.Iv_inst, internal_status.Iw_inst);
 #endif
 
-#ifdef SUPPORT_MISS_PHASE_DETECT_
+#ifdef SUPPORT_MISS_PHASE_DETECT
 	  if(MAIN_isSystemEnabled())
 		  MAIN_checkMissPhase(internal_status.Iu_inst, internal_status.Iv_inst, internal_status.Iw_inst);
 #endif

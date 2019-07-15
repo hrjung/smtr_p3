@@ -93,7 +93,7 @@ extern uint16_t gOffsetMeasureFlag;
 #endif
 
 static int evt_flag=0;
-int regen_duty=30; //default
+int regen_duty=70; //default
 
 uint16_t ud_volt_count=0, ov_volt_count=0;
 
@@ -656,7 +656,7 @@ void PROT_init(int input)
 		trip_info.V_input = input;
 		ERR_setTripFlag(TRIP_REASON_INPUT_VOLT_ERR);
 	}
-	regen_duty = (int)iparam[REGEN_DUTY_INDEX].value.l;
+	//regen_duty = (int)iparam[REGEN_DUTY_INDEX].value.l;
 }
 
 int processProtection(void)

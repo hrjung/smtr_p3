@@ -884,7 +884,7 @@ void PARAM_initInvStatus(void)
 void PARAM_setInvStatus(void)
 {
 	inv_status[INV_STATUS_INDEX].value.arr[0] = (MAIN_getDirection()<<8) | MAIN_isRunState();
-	inv_status[INV_STATUS_INDEX].value.arr[1] = (internal_status.shaft_brake_enabled<<8) | ovl_alarm_enable;
+	inv_status[INV_STATUS_INDEX].value.arr[1] = (internal_status.shaft_brake_locked<<8) | ovl_alarm_enable;
 
 	inv_status[INV_I_RMS_INDEX].value.f = MAIN_getIave();
 	inv_status[INV_RUN_FREQ_INDEX].value.f = STA_getCurFreq();
