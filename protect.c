@@ -598,6 +598,11 @@ int TEMP_monitorTemperature(void)
 
 		if(TEMP_isFanOff(ipm_temp)) UTIL_setFanOff();
 	}
+	// TODO : use when fan work OK
+//	else if(iparam[FAN_COMMAND_INDEX].value.l == 0) // alway on
+//	{
+//	    UTIL_setFanOn();
+//	}
 
 	if(ipm_temp > IPM_TEMPERATURE_LIMIT)
 	{

@@ -2371,7 +2371,7 @@ interrupt void mainISR(void)
 #endif
 
 #ifdef SUPPORT_MISS_PHASE_DETECT
-	  if(MAIN_isSystemEnabled())
+	  if(MAIN_isSystemEnabled() && !gFlag_PwmTest)
 		  MAIN_checkMissPhase(internal_status.Iu_inst, internal_status.Iv_inst, internal_status.Iw_inst);
 #endif
 

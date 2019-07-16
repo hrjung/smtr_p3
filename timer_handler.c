@@ -391,7 +391,7 @@ interrupt void timer0ISR(void)
 		}
 	}
 
-	if(secCnt%5 == 0) //every 0.5 sec
+	if(secCnt%5 == 0 && secCnt > 50) //every 0.5 sec after 5 sec
 	{
 		if(temp_flag == 0)
 			TEMP_monitorTemperature(); // IPM, Motor temperature check
