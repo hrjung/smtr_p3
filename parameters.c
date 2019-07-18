@@ -24,6 +24,10 @@
 #include "brake.h"
 #include "protect.h"
 
+#ifdef FLASH
+#pragma CODE_SECTION(PARAM_setErrInfo,"ramfuncs");
+#endif
+
 //*****************************************************************************
 //
 //! \addtogroup
@@ -883,7 +887,8 @@ void PARAM_initInvStatus(void)
 
 void PARAM_setInvStatus(void)
 {
-	inv_status[INV_STATUS_INDEX].value.arr[0] = (MAIN_getDirection()<<8) | MAIN_isRunState();
+	//inv_status[INV_STATUS_INDEX].value.arr[0] = (MAIN_getDirection()<<8) | MAIN_isRunState();
+    inv_status[INV_STATUS_INDEX].value.arr[0] = (MAIN_getDirection()<<8) | (m_status.status&0xF);
 	inv_status[INV_STATUS_INDEX].value.arr[1] = (internal_status.shaft_brake_locked<<8) | ovl_alarm_enable;
 
 	inv_status[INV_I_RMS_INDEX].value.f = MAIN_getIave();

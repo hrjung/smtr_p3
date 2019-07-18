@@ -17,6 +17,7 @@
 #include "state_func.h"
 #include "timer_handler.h"
 #include "err_trip.h"
+#include "common_tools.h"
 
 #ifdef FLASH
 #pragma CODE_SECTION(timer0ISR,"ramfuncs");
@@ -378,7 +379,6 @@ interrupt void timer0ISR(void)
 
 	if(gFlag_LogEnabled) // print log at every 1 sec
 	{
-
 		if(secCnt%10 == 0)
 		{
 			if(dbg_flag == 0) printLog();
@@ -400,6 +400,15 @@ interrupt void timer0ISR(void)
 	}
 	else
 		temp_flag=0;
+
+	// read MCU error
+	if(gTimerCount%30 == 0 && secCnt > 50) // every 30 ms, delay 5 sec
+	{
+	    if(UTIL_isMcuError())
+	    {
+	        ERR_setTripFlag(TRIP_REASON_MCU_ERR);
+	    }
+	}
 
 #ifdef SUPPORT_MISS_PHASE_DETECT
 	if(MAIN_isSystemEnabled())

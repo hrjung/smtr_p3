@@ -18,6 +18,10 @@
 #include "err_trip.h"
 #include "common_tools.h"
 
+#ifdef FLASH
+#pragma CODE_SECTION(TEMP_monitorTemperature,"ramfuncs");
+#endif
+
 /*******************************************************************************
  * MACROS
  */
@@ -565,7 +569,7 @@ int REGEN_process(float_t dc_volt)
 //	return 0;
 //}
 
-int TEMP_isFanOn(float_t ipm_temp)
+inline int TEMP_isFanOn(float_t ipm_temp)
 {
 	if(internal_status.fan_enabled == 1) return 0; // already on
 
@@ -574,7 +578,7 @@ int TEMP_isFanOn(float_t ipm_temp)
 
 }
 
-int TEMP_isFanOff(float_t ipm_temp)
+inline int TEMP_isFanOff(float_t ipm_temp)
 {
 	if(internal_status.fan_enabled == 0) return 0; // already off
 
@@ -598,11 +602,10 @@ int TEMP_monitorTemperature(void)
 
 		if(TEMP_isFanOff(ipm_temp)) UTIL_setFanOff();
 	}
-	// TODO : use when fan work OK
-//	else if(iparam[FAN_COMMAND_INDEX].value.l == 0) // alway on
-//	{
-//	    UTIL_setFanOn();
-//	}
+	else if(iparam[FAN_COMMAND_INDEX].value.l == 0) // alway on
+	{
+	    UTIL_setFanOn();
+	}
 
 	if(ipm_temp > IPM_TEMPERATURE_LIMIT)
 	{

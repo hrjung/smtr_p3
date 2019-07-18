@@ -107,6 +107,7 @@
 
 #define KRPM_SCALE_FACTOR		(1000.0)
 
+
 #define US_TO_CNT(A) ((((long double) A * (long double)USER_SYSTEM_FREQ_MHz) - 9.0L) / 5.0L)
 // **************************************************************************
 // the extern function

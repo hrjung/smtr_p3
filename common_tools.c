@@ -16,10 +16,15 @@
 #include "common_tools.h"
 #include "uartstdio.h"
 
+#ifdef FLASH
+#pragma CODE_SECTION(UTIL_isMcuError,"ramfuncs");
+#endif
+
 /*******************************************************************************
  * MACROS
  */
 
+#define MCU_ERROR_SAMPLE_CNT    10
 
 /*******************************************************************************
  * CONSTANTS
@@ -37,6 +42,8 @@ extern HAL_Handle halHandle;
 #ifdef SUPPORT_COMM_MCU_STATE
 extern uint16_t comm_mcu_status;
 #endif
+
+uint16_t mcu_err_val[MCU_ERROR_SAMPLE_CNT];
 
 //*****************************************************************************
 //
@@ -146,6 +153,31 @@ void UTIL_testbit1(int on_off) // test bit 1
         HAL_setGpioHigh(halHandle,(GPIO_Number_e)HAL_Gpio_Test1);
     else
         HAL_setGpioLow(halHandle,(GPIO_Number_e)HAL_Gpio_Test1);
+}
+
+bool UTIL_readMcuError(void)
+{
+    return HAL_readGpio(halHandle,(GPIO_Number_e)HAL_Gpio_MCU_ERR);
+}
+
+uint16_t UTIL_isMcuError(void)
+{
+    static int err_idx=0;
+    int i;
+    uint16_t err_sum=0;
+
+    // read MCU error flag
+    err_idx = err_idx%MCU_ERROR_SAMPLE_CNT;
+    mcu_err_val[err_idx] = (uint16_t)UTIL_readMcuError();
+    err_idx++;
+
+    err_sum=0;
+    for(i=0; i<MCU_ERROR_SAMPLE_CNT; i++) err_sum += mcu_err_val[i];
+
+    if(err_sum == MCU_ERROR_SAMPLE_CNT)
+        return 1;
+    else
+        return 0;
 }
 
 //*****************************************************************************
