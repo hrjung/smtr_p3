@@ -201,6 +201,10 @@ extern float_t UTIL_readIpmTemperature(void);
 extern float_t UTIL_readMotorTemperature(void);
 extern uint16_t UTIL_readMotorTemperatureStatus(void);
 
+#ifdef SUPPORT_MOTOR_PARAM
+extern void MAIN_setDeviceConstant(void);
+#endif
+
 extern void ERR_printTripInfo(void);
 
 #ifdef SUPPORT_MISS_PHASE_DETECT
@@ -524,7 +528,7 @@ STATIC void dbg_showMotorParam(void)
 	UARTprintf(" Motor Parameter Settings\n");
 #ifdef SUPPORT_MOTOR_PARAM
 	UARTprintf("\t input_volt: %d, poles %d, rated_freq: %d\n", mtr_param.voltage_in, mtr_param.pole_pairs, mtr_param.rated_freq);
-	UARTprintf("\t no load current: %f, max_current: %f\n", mtr_param.noload_current, mtr_param.max_current);
+	UARTprintf("\t no load current: %f, rated_current: %f\n", mtr_param.noload_current, mtr_param.rated_current);
 	UARTprintf("\t Rs: %f, Rr: %f, Ls: %f\n", mtr_param.Rs, mtr_param.Rr, mtr_param.Ls);
 #else
 	UARTprintf("\t input_volt: %d, poles %d, rated_freq: %d\n", USER_MOTOR_VOLTAGE_IN, USER_MOTOR_NUM_POLE_PAIRS, USER_MOTOR_RATED_FREQUENCY);
@@ -549,12 +553,12 @@ STATIC void dbg_showTripData(void)
 	ERR_printTripInfo();
 }
 
-//extern _iq gVbus_lpf;
+extern _iq gVbus_lpf;
 STATIC void dbg_showMonitorParam(void)
 {
-	UARTprintf(" Inverter Status display\n");
+//  float_t gOver = _IQtoF(_IQdiv(_IQ(1.0),gVbus_lpf));
 
-//	float_t gOver = _IQtoF(_IQdiv(_IQ(1.0),gVbus_lpf));
+	UARTprintf(" Inverter Status display\n");
 
 	UARTprintf("\t Iu: %f, Iv: %f, Iw: %f, DC_V: %f\n", MAIN_getIu(), MAIN_getIv(), MAIN_getIw(), MAIN_getVdcBus());
 	UARTprintf("\t RMS Iu: %f, Iv: %f, Iw: %f, Iave: %f \n", internal_status.Irms[0], internal_status.Irms[1], internal_status.Irms[2], m_status.current);
@@ -1166,12 +1170,13 @@ STATIC int dbg_processMotorParam(int argc, char *argv[])
 		mtr_set = (uint16_t)atoi(argv[1]);
 		if(mtr_set >= MOTOR_TYPE_MAX) goto mtr_err;
 
-		MPARAM_init(MOTOR_SY_1_5K_TYPE);
+		MPARAM_init(mtr_set);
 		MPARAM_setMotorParam(&gUserParams);
+		MAIN_setDeviceConstant();
 
 		CTRL_setParams(ctrlHandle,&gUserParams);
 		CTRL_setUserMotorParams(ctrlHandle);
-		UARTprintf(" update motor param in running %d\n");
+		UARTprintf(" update motor param type=%d\n", mtr_set);
 #else
 		UARTprintf(" not supported\n");
 #endif
@@ -2099,15 +2104,19 @@ STATIC int dbg_tmpTest(int argc, char *argv[])
     }
     else if(index == 8)
     {
+        int onoff;
     	//UTIL_controlLed(HAL_Gpio_LED_R2, 1);
     	//UTIL_controlLed(HAL_Gpio_LED_G, 1);
-    	UTIL_setFanOff();
-    	UARTprintf(" Fan off %d, %d\n", internal_status.fan_enabled, (int)iparam[FAN_COMMAND_INDEX].value.l);
+        onoff = atoi(argv[2]);
+        if(onoff == 0)
+            UTIL_setFanOff();
+        else
+            UTIL_setFanOn();
+    	UARTprintf(" Fan onoff=%d, %d\n", internal_status.fan_enabled, (int)iparam[FAN_COMMAND_INDEX].value.l);
     }
     else if(index == 9)
     {
-    	UTIL_setFanOn();
-    	UARTprintf(" Fan on %d, %d\n", internal_status.fan_enabled, (int)iparam[FAN_COMMAND_INDEX].value.l);
+
     }
     else if(index == 'g')
     {

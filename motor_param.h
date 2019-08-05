@@ -16,7 +16,7 @@
  */
 
 // motor type
-#define	MOTOR_TEST_0_25k_TYPE		0
+#define MOTOR_SY_0_8K_TYPE          0
 #define MOTOR_SY_1_5K_TYPE        	1
 #define MOTOR_SY_1_5K_IE3_TYPE     	2
 #define MOTOR_SY_2_2K_TYPE        	3
@@ -31,6 +31,7 @@ typedef struct
 	uint16_t 	voltage_in;
 
 	float_t		noload_current;
+	float_t     rated_current;
 	float_t		max_current;
 	float_t 	Rs;
 	float_t		Rr;

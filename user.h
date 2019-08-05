@@ -382,8 +382,10 @@ extern "C" {
 
 //! \brief USER MOTOR & ID SETTINGS
 // **************************************************************************
+#define SAMYANG_0_8K_MOTOR      300
 #define SAMYANG_1_5K_MOTOR		310
 #define SAMYANG_2_2K_MOTOR		320
+
 
 #define USER_MOTOR 				SAMYANG_1_5K_MOTOR
 
@@ -392,23 +394,48 @@ extern "C" {
 #define USER_MOTOR_RATED_FREQUENCY		(60)
 #define USER_MOTOR_VOLTAGE_IN			(380)
 
-#if (USER_MOTOR == SAMYANG_1_5K_MOTOR)
+#if (USER_MOTOR == SAMYANG_0_8K_MOTOR)
+    #define USER_MOTOR_NO_LOAD_CURRENT      (1.2)
+    #define USER_MOTOR_RATED_CURRENT        (1.9)
+
+    // 1 HP IE3, calcualated by Maxwell design
+    #define USER_MOTOR_Rr                   (4.53517)
+    #define USER_MOTOR_Rs                   (5.91)
+    #define USER_MOTOR_Ls_d                 (0.016984)
+    #define USER_MOTOR_Ls_q                 USER_MOTOR_Ls_d
+    #define USER_MOTOR_RATED_FLUX           (4.94542551) //(4.873543)
+    #define USER_MOTOR_MAGNETIZING_CURRENT  (USER_MOTOR_NO_LOAD_CURRENT*1.4142) // 2.0*sqrt(2)
+    #define USER_MOTOR_RES_EST_CURRENT      (1.0)
+    #define USER_MOTOR_IND_EST_CURRENT      (NULL)
+    #define USER_MOTOR_MAX_CURRENT          (6.5)
+    #define USER_MOTOR_FLUX_EST_FREQ_Hz     (5.0)
+
+#elif (USER_MOTOR == SAMYANG_1_5K_MOTOR)
 
     #define USER_MOTOR_NO_LOAD_CURRENT      (2.0)
     #define USER_MOTOR_RATED_CURRENT        (3.4)
-#if 1// test value
-    #define USER_MOTOR_Rr                   (2.006833315) //(1.79456)
-    #define USER_MOTOR_Rs                   (2.549335718) //(2.15)
-    #define USER_MOTOR_Ls_d                 (0.009685347788) //(0.016746)
+
+    // IE3 calculated from design value
+    #define USER_MOTOR_Rr                   (2.1915)
+    #define USER_MOTOR_Rs                   (2.1693)
+    #define USER_MOTOR_Ls_d                 (0.013229)
     #define USER_MOTOR_Ls_q                 USER_MOTOR_Ls_d
-    #define USER_MOTOR_RATED_FLUX           (4.94542551) //(4.873543)
-#else
-    #define USER_MOTOR_Rr                   (2.14568)
-    #define USER_MOTOR_Rs                   (2.5)
-    #define USER_MOTOR_Ls_d                 (0.013955)
-    #define USER_MOTOR_Ls_q                 USER_MOTOR_Ls_d
-    #define USER_MOTOR_RATED_FLUX           (4.923143)
-#endif
+    #define USER_MOTOR_RATED_FLUX           (4.936045)
+
+    // IE2 identified value
+//    #define USER_MOTOR_Rr                   (2.006833315) //(1.79456)
+//    #define USER_MOTOR_Rs                   (2.549335718) //(2.15)
+//    #define USER_MOTOR_Ls_d                 (0.009685347788) //(0.016746)
+//    #define USER_MOTOR_Ls_q                 USER_MOTOR_Ls_d
+//    #define USER_MOTOR_RATED_FLUX           (4.94542551) //(4.873543)
+
+    // IE2 : informed value from Samyang
+//    #define USER_MOTOR_Rr                   (2.14568)
+//    #define USER_MOTOR_Rs                   (2.5)
+//    #define USER_MOTOR_Ls_d                 (0.013955)
+//    #define USER_MOTOR_Ls_q                 USER_MOTOR_Ls_d
+//    #define USER_MOTOR_RATED_FLUX           (4.923143)
+
     #define USER_MOTOR_MAGNETIZING_CURRENT  (USER_MOTOR_NO_LOAD_CURRENT*1.4142) // 2.0*sqrt(2)
     #define USER_MOTOR_RES_EST_CURRENT      (1.0)
     #define USER_MOTOR_IND_EST_CURRENT      (NULL)

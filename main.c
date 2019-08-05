@@ -225,7 +225,7 @@ extern motor_param_st mtr_param;
 #endif
 
 //monitor_param_st mnt;
-inv_state_st state_param = {STATE_STOP, 0, STOP};
+inv_state_st state_param = {STATE_STOP, STOP};
 
 float_t sf4pu_krpm, sf4krpm_pu;
 float_t temp_spd_ref=0.0;
@@ -343,11 +343,16 @@ _iq Iq_fbackValue = _IQ(0.0);
 _iq angle_pu = _IQ(0.0);
 _iq Id_refValue = _IQ(0.0);
 
-
-#if (USER_MOTOR == SAMYANG_1_5K_MOTOR) // 1Hz -> 30rpm
-_iq foc_end_rpm = _IQ(0.015); // 0.5Hz
+#ifdef SUPPORT_MOTOR_PARAM
+float foc_end_rpm=0.015;
+#else
+#if (USER_MOTOR == SAMYANG_0_8K_MOTOR)
+    float foc_end_rpm=0.015;
+#elif (USER_MOTOR == SAMYANG_1_5K_MOTOR)
+    float foc_end_rpm=0.015;
 #elif (USER_MOTOR == SAMYANG_2_2K_MOTOR)
-_iq foc_end_rpm = _IQ(0.03);
+    float foc_end_rpm=0.03;
+#endif
 #endif
 
 void SetGpioInterrupt(void);
@@ -974,6 +979,65 @@ void MAIN_setSpeedGain(int fw_enabled)
 	}
 }
 
+void MAIN_initInternalVariable(void)
+{
+    internal_status.Iu_inst = 0.0;
+    internal_status.Iv_inst = 0.0;
+    internal_status.Iw_inst = 0.0;
+
+    internal_status.Irms[0] = 0.0;
+    internal_status.Irms[1] = 0.0;
+    internal_status.Irms[2] = 0.0;
+
+    internal_status.Vrms[0] = 0.0;
+    internal_status.Vrms[1] = 0.0;
+    internal_status.Vrms[2] = 0.0;
+
+    internal_status.Vpprms[0] = 0.0;
+    internal_status.Vpprms[1] = 0.0;
+    internal_status.Vpprms[2] = 0.0;
+
+    internal_status.Vu_inst = 0.0;
+    internal_status.Vv_inst = 0.0;
+    internal_status.Vw_inst = 0.0;
+
+    internal_status.Iu_miss_cnt = 0;
+    internal_status.Iv_miss_cnt = 0;
+    internal_status.Iw_miss_cnt = 0;
+
+    internal_status.Vdc_inst = 0.0;
+    internal_status.angle_pu = 0.0;
+
+    internal_status.Vab_pu[0] = 0.0;
+    internal_status.Vab_pu[1] = 0.0;
+
+    internal_status.phasor[0] = 0.0;
+    internal_status.phasor[1] = 0.0;
+
+    internal_status.pwmData[0] = 0.0;
+    internal_status.pwmData[1] = 0.0;
+    internal_status.pwmData[2] = 0.0;
+
+    internal_status.accel_resol = 0.0;
+    internal_status.decel_resol = 0.0;
+    internal_status.rev_resol = 0.0;
+
+    internal_status.spd_rpm = 0;
+
+    internal_status.ipm_temp = 0;
+    internal_status.mtr_temp = 0;
+
+    internal_status.relay_enabled = 0;
+    internal_status.regen_enabled = 0;
+    internal_status.trip_happened = 0;
+    internal_status.fan_enabled = 0;
+    internal_status.shaft_brake_locked = 0;
+
+    internal_status.oc_count = 0;
+
+    ERR_initTripInfo();
+}
+
 void MAIN_setDeviceConstant(void)
 {
 	UTIL_setScaleFactor();
@@ -998,65 +1062,7 @@ void MAIN_setDeviceConstant(void)
 	//set additional flag
 
 	state_param.inv = STATE_STOP;
-	state_param.sel_in = NOT_USED;
 	state_param.run = STOP;
-
-	internal_status.Iu_inst = 0.0;
-	internal_status.Iv_inst = 0.0;
-	internal_status.Iw_inst = 0.0;
-
-	internal_status.Irms[0] = 0.0;
-	internal_status.Irms[1] = 0.0;
-	internal_status.Irms[2] = 0.0;
-
-	internal_status.Vrms[0] = 0.0;
-	internal_status.Vrms[1] = 0.0;
-	internal_status.Vrms[2] = 0.0;
-
-	internal_status.Vpprms[0] = 0.0;
-	internal_status.Vpprms[1] = 0.0;
-	internal_status.Vpprms[2] = 0.0;
-
-	internal_status.Vu_inst = 0.0;
-	internal_status.Vv_inst = 0.0;
-	internal_status.Vw_inst = 0.0;
-
-	internal_status.Iu_miss_cnt = 0;
-	internal_status.Iv_miss_cnt = 0;
-	internal_status.Iw_miss_cnt = 0;
-
-	internal_status.Vdc_inst = 0.0;
-	internal_status.angle_pu = 0.0;
-
-	internal_status.Vab_pu[0] = 0.0;
-	internal_status.Vab_pu[1] = 0.0;
-
-	internal_status.phasor[0] = 0.0;
-	internal_status.phasor[1] = 0.0;
-
-	internal_status.pwmData[0] = 0.0;
-	internal_status.pwmData[1] = 0.0;
-	internal_status.pwmData[2] = 0.0;
-
-	internal_status.accel_resol = 0.0;
-	internal_status.decel_resol = 0.0;
-	internal_status.rev_resol = 0.0;
-
-	internal_status.spd_rpm = 0;
-
-	internal_status.ipm_temp = 0;
-	internal_status.mtr_temp = 0;
-
-	internal_status.relay_enabled = 0;
-	internal_status.regen_enabled = 0;
-	internal_status.trip_happened = 0;
-	internal_status.fan_enabled = 0;
-	internal_status.shaft_brake_locked = 0;
-
-	internal_status.oc_count = 0;
-
-	ERR_initTripInfo();
-
 }
 
 #if 1
@@ -1349,7 +1355,7 @@ void main(void)
 #endif
 
 #ifdef SUPPORT_MOTOR_PARAM
-  MPARAM_init(MOTOR_SY_2_2K_TYPE);
+  MPARAM_init(MOTOR_SY_0_8K_TYPE);
   //MPARAM_setMotorParam(&gUserParams);
 #endif
   PARAM_init();
@@ -1367,6 +1373,7 @@ void main(void)
   MPARAM_setMotorParam(&gUserParams);
 #endif
   MAIN_setDeviceConstant();
+  MAIN_initInternalVariable();
 
   // check for errors in user parameters
   USER_checkForErrors(&gUserParams);
@@ -2271,7 +2278,7 @@ interrupt void mainISR(void)
   //TODO : just temp stop for haunting at low speed of FOC
   if(DRV_isFocControl()
 	 && STA_getTargetFreq() == 0.0
-	 && _IQabs(gMotorVars.Speed_krpm) <= foc_end_rpm) // about 1Hz for 2.2k, 0.5Hz for 1.5k
+	 && _IQabs(gMotorVars.Speed_krpm) <= _IQ(foc_end_rpm)) // about 1Hz for 2.2k, 0.5Hz for 1.5k
   {
 #ifdef SUPPORT_DIRECTION_STATUS
 	  if(STA_isDirChanged())
@@ -2463,7 +2470,7 @@ void updateGlobalVariables_user(void)
 	internal_status.ipm_temp = gAdcData.ipm_temperature;
 	internal_status.mtr_temp = gAdcData.mtr_temperature;
 
-#if 1 // to avoid haunting at FW
+#if 0 // to avoid haunting at FW
 	if(gMotorVars.Speed_krpm > _IQ(FW_GAIN_UPDATE_HIGH_KRPM))
 		MAIN_setSpeedGain(1);
 	else if(gMotorVars.Speed_krpm < _IQ(FW_GAIN_UPDATE_LOW_KRPM))
@@ -2871,8 +2878,8 @@ void UTIL_setScaleFactor(void)
 {
 	// scale factor for pu -> krpm
 #ifdef SUPPORT_MOTOR_PARAM
-	sf4pu_krpm = (60.0*USER_IQ_FULL_SCALE_FREQ_Hz) / (mtr_param.pole_pairs*1000.0); // 15
-	sf4krpm_pu = (mtr_param.pole_pairs*1000.0) / (60.0*USER_IQ_FULL_SCALE_FREQ_Hz);
+	sf4pu_krpm = (mtr_param.rated_freq*USER_IQ_FULL_SCALE_FREQ_Hz) / (mtr_param.pole_pairs*1000.0); // 15
+	sf4krpm_pu = (mtr_param.pole_pairs*1000.0) / (mtr_param.rated_freq*USER_IQ_FULL_SCALE_FREQ_Hz);
 #else
 	sf4pu_krpm = (60.0*USER_IQ_FULL_SCALE_FREQ_Hz) / ((float_t)USER_MOTOR_NUM_POLE_PAIRS*1000.0); // 15
 	sf4krpm_pu = ((float_t)USER_MOTOR_NUM_POLE_PAIRS*1000.0) / (60.0*USER_IQ_FULL_SCALE_FREQ_Hz);
@@ -2900,7 +2907,7 @@ float_t UTIL_readIpmTemperature(void)
     uint32_t ipm_sum=0;
     uint16_t ipm_ave_value=0;
 
-    // read DI
+    // read IPM temperature
     ipm_idx = ipm_idx%TEMPERATURE_SAMPLE_CNT;
     ipm_temp_val[ipm_idx] = internal_status.ipm_temp;
     ipm_idx++;
@@ -2922,7 +2929,7 @@ uint16_t UTIL_readMotorTemperature(void)
     uint32_t mtr_sum=0;
     uint16_t mtr_ave_value=0;
 
-    // read DI
+    // read Motor temperature
     mtr_idx = mtr_idx%TEMPERATURE_SAMPLE_CNT;
     mtr_temp_val[mtr_idx] = internal_status.mtr_temp;
     mtr_idx++;

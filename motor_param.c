@@ -27,19 +27,20 @@
 #define PWM_DEADBAND_LIMITATION  (0.93)
 
 
-const motor_param_st TEST_0_25k = {
-	2,		//pole_pairs;
-	60, 	//rated_freq;
-	220, 	//voltage_in;
+const motor_param_st SY_0_8k = {
+    2,      //pole_pairs;
+    60,     //rated_freq;
+    380,    //voltage_in;
 
-	1.15, 	//noload_current;
-	3.0, 	//max_current;
-	10.1598806, 	//Rs;
-	5.574939, //Rr;
-	0.00392938871, //Ls;
+    1.2,    //noload_current;
+    1.9,    // rated current
+    6.5,    //max_current;
+    7.7107, //Rs;
+    4.0901, //Rr;
+    0.062048, //Ls;
 
-	1.626346, 	//magnetize_current;
-	2.953668, 	//rated_flux;
+    (0.89*1.4142),   //USER_MOTOR_MAGNETIZING_CURRENT;
+    4.94542551,   //USER_MOTOR_RATED_FLUX;
 };
 
 const motor_param_st SY_1_5k = {
@@ -48,12 +49,13 @@ const motor_param_st SY_1_5k = {
 	380, 	//voltage_in;
 
 	2.0, 	//noload_current;
-	3.4, 	//max_current;
+	3.4,    // rated current
+	10.0, 	//max_current;
 	2.5, 	//Rs;
 	2.14568, //Rr;
 	0.013955, //Ls;
 
-	2.828427, 	//USER_MOTOR_MAGNETIZING_CURRENT;
+	(2.0*104142), //USER_MOTOR_MAGNETIZING_CURRENT;
 	4.923143, 	//USER_MOTOR_RATED_FLUX;
 };
 
@@ -63,13 +65,14 @@ const motor_param_st SY_1_5k_ie3 = {
 	380, 	//voltage_in;
 
 	2.0, 	//noload_current;
-	3.4, 	//max_current;
-	2.5, 	//Rs;
-	2.14568, //Rr;
-	0.013955, //Ls;
+	3.6, 	//rated current;
+	10.0,   //max_current;
+	2.1693, 	//Rs;
+	2.1915, //Rr;
+	0.013229, //Ls;
 
 	2.828427, 	//magnetize_current;
-	4.923143, 	//rated_flux;
+	4.936045, 	//rated_flux;
 };
 
 const motor_param_st SY_2_2k = {
@@ -78,7 +81,8 @@ const motor_param_st SY_2_2k = {
 	380, 	//voltage_in;
 
 	3.235, 	//noload_current;
-	5.3, 	//max_current;
+	5.3, 	// rated current
+	17.0,   //max_current;
 	2.86, 	//Rs;
 	1.14793, //Rr;
 	0.01092, //Ls;
@@ -90,6 +94,8 @@ const motor_param_st SY_2_2k = {
 
 motor_param_st mtr_param;
 #endif
+
+extern float foc_end_rpm;
 //*****************************************************************************
 //
 // Function implementation
@@ -99,17 +105,17 @@ motor_param_st mtr_param;
 void MPARAM_setDciPwmRate(float_t rate)
 {
 #ifdef SUPPORT_MOTOR_PARAM
-	dev_const.dci_pwm_rate = rate/100.0 * mtr_param.max_current*mtr_param.Rs;
+	dev_const.dci_pwm_rate = rate/100.0 * mtr_param.rated_current*mtr_param.Rs;
 #else
 	//dev_const.dci_pwm_rate = rate/100.0 * USER_MOTOR_MAX_CURRENT/sqrtf(2.0)*USER_MOTOR_Rs*2; //*2 for Y connection
-	dev_const.dci_pwm_rate = rate/100.0 * USER_MOTOR_MAX_CURRENT*USER_MOTOR_Rs*2;
+	dev_const.dci_pwm_rate = rate/100.0 * USER_MOTOR_RATED_CURRENT*USER_MOTOR_Rs*2;
 #endif
 }
 
 void MPARAM_setOvlTripLevel(uint32_t level)
 {
 #ifdef SUPPORT_MOTOR_PARAM
-	dev_const.trip_level = mtr_param.max_current*(float_t)level/100.0;
+	dev_const.trip_level = mtr_param.rated_current*(float_t)level/100.0;
 #else
 	dev_const.trip_level = USER_MOTOR_RATED_CURRENT*(float_t)level/100.0;
 #endif
@@ -118,7 +124,7 @@ void MPARAM_setOvlTripLevel(uint32_t level)
 void MPARAM_setOvlWarnLevel(uint32_t level)
 {
 #ifdef SUPPORT_MOTOR_PARAM
-	dev_const.warn_level = mtr_param.max_current*(float_t)level/100.0;
+	dev_const.warn_level = mtr_param.rated_current*(float_t)level/100.0;
 #else
 	dev_const.warn_level = USER_MOTOR_RATED_CURRENT*(float_t)level/100.0;
 #endif
@@ -129,13 +135,13 @@ void MPARAM_init(uint16_t type)
 {
 	switch(type)
 	{
-	case MOTOR_TEST_0_25k_TYPE: mtr_param = TEST_0_25k; break;
-	case MOTOR_SY_1_5K_TYPE: mtr_param = SY_1_5k; break;
-	case MOTOR_SY_2_2K_TYPE: mtr_param = SY_2_2k; break;
+	case MOTOR_SY_0_8K_TYPE: mtr_param = SY_0_8k; foc_end_rpm = 0.015; break;
+	case MOTOR_SY_1_5K_TYPE: mtr_param = SY_1_5k; foc_end_rpm = 0.015; break;
+	case MOTOR_SY_2_2K_TYPE: mtr_param = SY_2_2k; foc_end_rpm = 0.03; break;
 
 	case MOTOR_SY_1_5K_IE3_TYPE:
 	default:
-		mtr_param = SY_1_5k_ie3;
+		mtr_param = SY_1_5k_ie3; foc_end_rpm = 0.015;
 		break;
 	}
 }
@@ -166,18 +172,19 @@ void MPARAM_updateDevConst(void)
 	MPARAM_setOvlTripLevel(iparam[OVL_TR_LIMIT_INDEX].value.l);
 	MPARAM_setOvlWarnLevel(iparam[OVL_WARN_LIMIT_INDEX].value.l);
 #ifdef SUPPORT_MOTOR_PARAM
-	dev_const.ovc_level = mtr_param.max_current*3.0;
+	dev_const.ovc_level = mtr_param.rated_current*3.5;
 #else
 	dev_const.ovc_level = USER_MOTOR_RATED_CURRENT*3.5;
 	//dev_const.ovc_level = 2.1; //USER_MOTOR_RATED_CURRENT*0.5; // test only
 #endif
 	MPARAM_setDciPwmRate(iparam[BRK_DCI_BRAKING_RATE_INDEX].value.f);
+
 }
 
 float_t FREQ_convertToSpeed(float_t freq)
 {
 #ifdef SUPPORT_MOTOR_PARAM
-    float_t spd_rpm = (freq*60.0 / mtr_param.pole_pairs);
+    float_t spd_rpm = (freq*mtr_param.rated_freq / mtr_param.pole_pairs);
 #else
 	float_t spd_rpm = (freq*60.0 /USER_MOTOR_NUM_POLE_PAIRS);
 #endif

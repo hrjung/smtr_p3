@@ -625,7 +625,7 @@ int TEMP_monitorTemperature(void)
 	else
 		ipm_count=0;
 
-
+#if 0
 	mtr_temp = UTIL_readMotorTemperatureStatus();
 	if(mtr_temp == 2) // Motor temperature trip
 	{
@@ -634,10 +634,11 @@ int TEMP_monitorTemperature(void)
 		ERR_setTripFlag(TRIP_REASON_MTR_OVER_TEMP);
 		if(mtr_status != 2)
 		{
-			UARTprintf("Motor over temperature %f\n", mtr_temp);
+			UARTprintf("ERR : Motor over temperature %f\n", mtr_temp);
 			mtr_status = 2;
 		}
 	}
+#endif
 
 	return 0;
 }

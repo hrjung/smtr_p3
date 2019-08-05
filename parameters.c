@@ -81,7 +81,7 @@ int (*iparam_func[INV_PARAM_INDEX_MAX])(union32_st value) = {
 		PARAM_setRegenBand, 			//REGEN_BAND_INDEX
 
 		PARAM_setFanControl,	//FAN_COMMAND_INDEX
-
+		PARAM_setMotorType,      //MOTOR_TYPE_INDEX
 };
 
 
@@ -113,6 +113,65 @@ extern uint16_t UTIL_readMotorTemperatureStatus(void);
 // Function implementation
 //
 //*****************************************************************************
+
+int PARAM_setMotorParam(uint32_t type)
+{
+#ifdef SUPPORT_MOTOR_PARAM
+    MPARAM_init((uint16_t)type);
+
+    iparam[STATOR_RESISTANCE_INDEX].type = PARAMETER_TYPE_FLOAT;
+    iparam[STATOR_RESISTANCE_INDEX].value.f = mtr_param.Rs;
+
+    iparam[ROTATOR_RESISTANCE_INDEX].type = PARAMETER_TYPE_FLOAT;
+    iparam[ROTATOR_RESISTANCE_INDEX].value.f = mtr_param.Rr;
+
+    iparam[INDUCTANCE_INDEX].type = PARAMETER_TYPE_FLOAT;
+    iparam[INDUCTANCE_INDEX].value.f = mtr_param.Ls;
+
+    iparam[NOLOAD_CURRENT_INDEX].type = PARAMETER_TYPE_FLOAT;
+    iparam[NOLOAD_CURRENT_INDEX].value.f = mtr_param.noload_current;
+
+    iparam[RATED_CURRENT_INDEX].type = PARAMETER_TYPE_FLOAT;
+    iparam[RATED_CURRENT_INDEX].value.f = mtr_param.rated_current;
+
+    iparam[POLES_INDEX].type = PARAMETER_TYPE_LONG;
+    iparam[POLES_INDEX].value.l = mtr_param.pole_pairs;
+
+    iparam[INPUT_VOLTAGE_INDEX].type = PARAMETER_TYPE_LONG;
+    iparam[INPUT_VOLTAGE_INDEX].value.l = mtr_param.voltage_in;
+
+    iparam[RATED_FREQ_INDEX].type = PARAMETER_TYPE_LONG;
+    iparam[RATED_FREQ_INDEX].value.l = mtr_param.rated_freq;
+
+#else
+
+    iparam[STATOR_RESISTANCE_INDEX].type = PARAMETER_TYPE_FLOAT;
+    iparam[STATOR_RESISTANCE_INDEX].value.f = USER_MOTOR_Rs;
+
+    iparam[ROTATOR_RESISTANCE_INDEX].type = PARAMETER_TYPE_FLOAT;
+    iparam[ROTATOR_RESISTANCE_INDEX].value.f = USER_MOTOR_Rr;
+
+    iparam[INDUCTANCE_INDEX].type = PARAMETER_TYPE_FLOAT;
+    iparam[INDUCTANCE_INDEX].value.f = USER_MOTOR_Ls_d;
+
+    iparam[NOLOAD_CURRENT_INDEX].type = PARAMETER_TYPE_FLOAT;
+    iparam[NOLOAD_CURRENT_INDEX].value.f = USER_MOTOR_NO_LOAD_CURRENT;
+
+    iparam[RATED_CURRENT_INDEX].type = PARAMETER_TYPE_FLOAT;
+    iparam[RATED_CURRENT_INDEX].value.f = USER_MOTOR_MAX_CURRENT;
+
+    iparam[POLES_INDEX].type = PARAMETER_TYPE_LONG;
+    iparam[POLES_INDEX].value.l = USER_MOTOR_NUM_POLE_PAIRS;
+
+    iparam[INPUT_VOLTAGE_INDEX].type = PARAMETER_TYPE_LONG;
+    iparam[INPUT_VOLTAGE_INDEX].value.l = USER_MOTOR_VOLTAGE_IN;
+
+    iparam[RATED_FREQ_INDEX].type = PARAMETER_TYPE_LONG;
+    iparam[RATED_FREQ_INDEX].value.l = USER_MOTOR_RATED_FREQUENCY;
+#endif
+
+    return 1;
+}
 
 void PARAM_init(void)
 {
@@ -237,55 +296,9 @@ void PARAM_init(void)
 	iparam[FAN_COMMAND_INDEX].type = PARAMETER_TYPE_LONG;
 	iparam[FAN_COMMAND_INDEX].value.l = 0;
 
-#ifdef SUPPORT_MOTOR_PARAM
-	iparam[STATOR_RESISTANCE_INDEX].type = PARAMETER_TYPE_FLOAT;
-	iparam[STATOR_RESISTANCE_INDEX].value.f = mtr_param.Rs;
-
-	iparam[ROTATOR_RESISTANCE_INDEX].type = PARAMETER_TYPE_FLOAT;
-	iparam[ROTATOR_RESISTANCE_INDEX].value.f = mtr_param.Rr;
-
-	iparam[INDUCTANCE_INDEX].type = PARAMETER_TYPE_FLOAT;
-	iparam[INDUCTANCE_INDEX].value.f = mtr_param.Ls;
-
-	iparam[NOLOAD_CURRENT_INDEX].type = PARAMETER_TYPE_FLOAT;
-	iparam[NOLOAD_CURRENT_INDEX].value.f = mtr_param.noload_current;
-
-	iparam[RATED_CURRENT_INDEX].type = PARAMETER_TYPE_FLOAT;
-	iparam[RATED_CURRENT_INDEX].value.f = mtr_param.max_current;
-
-	iparam[POLES_INDEX].type = PARAMETER_TYPE_LONG;
-	iparam[POLES_INDEX].value.l = mtr_param.pole_pairs;
-
-	iparam[INPUT_VOLTAGE_INDEX].type = PARAMETER_TYPE_LONG;
-	iparam[INPUT_VOLTAGE_INDEX].value.l = mtr_param.voltage_in;
-
-	iparam[RATED_FREQ_INDEX].type = PARAMETER_TYPE_LONG;
-	iparam[RATED_FREQ_INDEX].value.l = mtr_param.rated_freq;
-#else
-	iparam[STATOR_RESISTANCE_INDEX].type = PARAMETER_TYPE_FLOAT;
-	iparam[STATOR_RESISTANCE_INDEX].value.f = USER_MOTOR_Rs;
-
-	iparam[ROTATOR_RESISTANCE_INDEX].type = PARAMETER_TYPE_FLOAT;
-	iparam[ROTATOR_RESISTANCE_INDEX].value.f = USER_MOTOR_Rr;
-
-	iparam[INDUCTANCE_INDEX].type = PARAMETER_TYPE_FLOAT;
-	iparam[INDUCTANCE_INDEX].value.f = USER_MOTOR_Ls_d;
-
-	iparam[NOLOAD_CURRENT_INDEX].type = PARAMETER_TYPE_FLOAT;
-	iparam[NOLOAD_CURRENT_INDEX].value.f = USER_MOTOR_NO_LOAD_CURRENT;
-
-	iparam[RATED_CURRENT_INDEX].type = PARAMETER_TYPE_FLOAT;
-	iparam[RATED_CURRENT_INDEX].value.f = USER_MOTOR_MAX_CURRENT;
-
-	iparam[POLES_INDEX].type = PARAMETER_TYPE_LONG;
-	iparam[POLES_INDEX].value.l = USER_MOTOR_NUM_POLE_PAIRS;
-
-	iparam[INPUT_VOLTAGE_INDEX].type = PARAMETER_TYPE_LONG;
-	iparam[INPUT_VOLTAGE_INDEX].value.l = USER_MOTOR_VOLTAGE_IN;
-
-	iparam[RATED_FREQ_INDEX].type = PARAMETER_TYPE_LONG;
-	iparam[RATED_FREQ_INDEX].value.l = USER_MOTOR_RATED_FREQUENCY;
-#endif
+    iparam[MOTOR_TYPE_INDEX].type = PARAMETER_TYPE_LONG;
+    iparam[MOTOR_TYPE_INDEX].value.l = MOTOR_SY_1_5K_IE3_TYPE;
+	PARAM_setMotorParam(iparam[MOTOR_TYPE_INDEX].value.l);
 
 	iparam[INV_RUN_STOP_CMD_INDEX].type = PARAMETER_TYPE_LONG;
 	iparam[INV_RUN_STOP_CMD_INDEX].value.l = 0; // default stop
@@ -790,6 +803,17 @@ int PARAM_setFanControl(union32_st value)
 	UARTprintf("set Fan control %d is %s\n", (int)ldata, res_str[result]);
 
 	return result;
+}
+
+int PARAM_setMotorType(union32_st value)
+{
+    uint32_t ldata = value.l;
+    int result=0;
+
+    result = PARAM_setMotorParam(ldata);
+    UARTprintf("set Motor type %d is %s\n", (int)ldata, res_str[result]);
+
+    return result;
 }
 
 void PARAM_startRun(void)

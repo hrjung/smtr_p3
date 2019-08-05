@@ -176,7 +176,6 @@ typedef struct
 typedef struct
 {
 	int 	inv; // for state_func
-	int 	sel_in; // indicate which input source is used
 	int 	run; // for motor running status : REVERSE, STOP, FORWARD
 } inv_state_st;
 

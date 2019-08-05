@@ -105,18 +105,19 @@ enum {
 	REGEN_BAND_INDEX,
 
 	FAN_COMMAND_INDEX,		  	//30
+	MOTOR_TYPE_INDEX,
 	STATOR_RESISTANCE_INDEX,
 	ROTATOR_RESISTANCE_INDEX,
 	INDUCTANCE_INDEX,
-	NOLOAD_CURRENT_INDEX,
 
-	RATED_CURRENT_INDEX,		//35
+	NOLOAD_CURRENT_INDEX,           //35
+	RATED_CURRENT_INDEX,
 	POLES_INDEX,
 	INPUT_VOLTAGE_INDEX,
 	RATED_FREQ_INDEX,
-	INV_RUN_STOP_CMD_INDEX,
 
-	INV_PARAM_INDEX_MAX,		//40
+	INV_RUN_STOP_CMD_INDEX,         //40
+	INV_PARAM_INDEX_MAX,
 };
 
 extern uint16_t vf_foc_control;
@@ -168,6 +169,7 @@ extern int PARAM_setOvlTripTime(union32_st value);
 extern int PARAM_setRegenDuty(union32_st value);
 extern int PARAM_setRegenBand(union32_st value);
 extern int PARAM_setFanControl(union32_st value);
+extern int PARAM_setMotorType(union32_st value);
 
 extern void PARAM_update(uint16_t index, uint16_t *buf);
 extern uint16_t PARAM_getValue(uint16_t index, uint16_t *buf);
