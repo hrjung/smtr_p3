@@ -3006,6 +3006,8 @@ void processAutoLoadTest(void)
 
 	if(internal_status.relay_enabled == 0) return;
 
+	if(internal_status.trip_happened) return;
+
 #if 0
 	btn_state = TEST_readSwitch();
 
