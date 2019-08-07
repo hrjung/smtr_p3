@@ -82,7 +82,7 @@ const motor_param_st SY_2_2k = {
 
 	3.235, 	//noload_current;
 	5.3, 	// rated current
-	17.0,   //max_current;
+	18.7,   //max_current;
 	2.86, 	//Rs;
 	1.14793, //Rr;
 	0.01092, //Ls;

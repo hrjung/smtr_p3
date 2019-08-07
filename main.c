@@ -346,11 +346,11 @@ _iq Id_refValue = _IQ(0.0);
 #ifdef SUPPORT_MOTOR_PARAM
 float foc_end_rpm=0.015;
 #else
-#if (USER_MOTOR == SAMYANG_0_8K_MOTOR)
+#if (USER_MOTOR == SAMYANG_0_8K_4P_MOTOR)
     float foc_end_rpm=0.015;
-#elif (USER_MOTOR == SAMYANG_1_5K_MOTOR)
+#elif (USER_MOTOR == SAMYANG_1_5K_4P_MOTOR)
     float foc_end_rpm=0.015;
-#elif (USER_MOTOR == SAMYANG_2_2K_MOTOR)
+#elif (USER_MOTOR == SAMYANG_2_2K_4P_MOTOR)
     float foc_end_rpm=0.03;
 #endif
 #endif

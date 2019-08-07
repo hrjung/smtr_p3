@@ -625,7 +625,7 @@ int TEMP_monitorTemperature(void)
 	else
 		ipm_count=0;
 
-#if 1
+#if 0
 	mtr_temp = UTIL_readMotorTemperatureStatus();
 	if(mtr_temp == 2) // Motor temperature trip
 	{

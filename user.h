@@ -382,19 +382,19 @@ extern "C" {
 
 //! \brief USER MOTOR & ID SETTINGS
 // **************************************************************************
-#define SAMYANG_0_8K_MOTOR      300
-#define SAMYANG_1_5K_MOTOR		310
-#define SAMYANG_2_2K_MOTOR		320
+#define SAMYANG_0_8K_4P_MOTOR       300
+#define SAMYANG_1_5K_4P_MOTOR		310
+#define SAMYANG_2_2K_4P_MOTOR		320
 
 
-#define USER_MOTOR 				SAMYANG_1_5K_MOTOR
+#define USER_MOTOR 				SAMYANG_2_2K_4P_MOTOR
 
 #define USER_MOTOR_TYPE                 MOTOR_Type_Induction
 #define USER_MOTOR_NUM_POLE_PAIRS       (2)
 #define USER_MOTOR_RATED_FREQUENCY		(60)
 #define USER_MOTOR_VOLTAGE_IN			(380)
 
-#if (USER_MOTOR == SAMYANG_0_8K_MOTOR)
+#if (USER_MOTOR == SAMYANG_0_8K_4P_MOTOR)
     #define USER_MOTOR_NO_LOAD_CURRENT      (1.2)
     #define USER_MOTOR_RATED_CURRENT        (1.9)
 
@@ -410,7 +410,7 @@ extern "C" {
     #define USER_MOTOR_MAX_CURRENT          (6.5)
     #define USER_MOTOR_FLUX_EST_FREQ_Hz     (5.0)
 
-#elif (USER_MOTOR == SAMYANG_1_5K_MOTOR)
+#elif (USER_MOTOR == SAMYANG_1_5K_4P_MOTOR)
 
     #define USER_MOTOR_NO_LOAD_CURRENT      (2.0)
     #define USER_MOTOR_RATED_CURRENT        (3.4)
@@ -440,12 +440,13 @@ extern "C" {
     #define USER_MOTOR_RES_EST_CURRENT      (1.0)
     #define USER_MOTOR_IND_EST_CURRENT      (NULL)
     //#define USER_MOTOR_MAX_CURRENT          (3.4) //(4.0)
-    #define USER_MOTOR_MAX_CURRENT          (10.0) //(0.98*4.8) // max 4.8 = sqrt(2) * 3.4
+    #define USER_MOTOR_MAX_CURRENT          (12.0) //(0.98*4.8) // 3.4*sqrt(2) * 2.5
     #define USER_MOTOR_FLUX_EST_FREQ_Hz     (5.0)
 
-#elif (USER_MOTOR == SAMYANG_2_2K_MOTOR)
+#elif (USER_MOTOR == SAMYANG_2_2K_4P_MOTOR)
 
     #define USER_MOTOR_NO_LOAD_CURRENT      (3.235)
+    #define USER_MOTOR_RATED_CURRENT        (5.3)
 
     #define USER_MOTOR_Rr                   (1.14793)
     #define USER_MOTOR_Rs                   (2.86)
@@ -456,7 +457,7 @@ extern "C" {
     #define USER_MOTOR_MAGNETIZING_CURRENT  (USER_MOTOR_NO_LOAD_CURRENT*1.4142) // = no_load_current * sqrt(2)
     #define USER_MOTOR_RES_EST_CURRENT      (1.0)
     #define USER_MOTOR_IND_EST_CURRENT      (NULL)
-    #define USER_MOTOR_MAX_CURRENT          (5.3) //(4.0)
+    #define USER_MOTOR_MAX_CURRENT          (18.7) //5.3*sqrt(2) * 2.5
     #define USER_MOTOR_FLUX_EST_FREQ_Hz     (5.0)
 
 #else
