@@ -45,6 +45,8 @@ uint16_t spi_find_first=0, spi_chk_ok=0;
 uint16_t spi_checksum=0;
 uint16_t spi_rcv_cmd=0;
 
+uint16_t reset_requested_f=0;
+extern uint16_t reset_command_enabled_f;
 extern HAL_Handle halHandle;
 
 //*****************************************************************************
@@ -230,6 +232,20 @@ inline void SPI_makeResponse(uint16_t seq_no, uint16_t resp)
 
 }
 
+inline void SPI_handleTestCommand(uint16_t cmd)
+{
+    switch(cmd)
+    {
+    case SPI_TEST_CMD_TEST_MODE:
+
+        break;
+
+    case SPI_TEST_CMD_RESET:
+        reset_requested_f = 1;
+        break;
+    }
+}
+
 interrupt void spiARxISR(void)
 {
 	HAL_Obj *obj = (HAL_Obj *)halHandle;
@@ -270,7 +286,7 @@ interrupt void spiARxISR(void)
 				spi_chk_ok=1;
 
 				seq_no = spiRx.buf[3];
-				cmd = spiRx.buf[4]&0x00FF;
+				cmd = spiRx.buf[4]&0x10FF; // add test cmd
 				if(cmd&0x001F) // command
 				{
 					spi_rcv_cmd = cmd&0x001F;
@@ -307,9 +323,9 @@ interrupt void spiARxISR(void)
 						spi_chk_ok=0; //  queue is full
 
 				}
-				else if(cmd&0x00E0) // status request, respond now
+				else if(cmd&0x10E0) // status request, respond now + test command
 				{
-					spi_rcv_cmd = cmd&0x00E0;
+					spi_rcv_cmd = cmd&0x10E0;
 					switch(spi_rcv_cmd)
 					{
 					case SPICMD_REQ_ST:
@@ -322,6 +338,12 @@ interrupt void spiARxISR(void)
 
 					case SPICMD_PARAM_R:
 						SPI_makeParamResponse(seq_no, spiRx.buf[5]);
+						break;
+
+					case SPICMD_TEST_CMD:
+					    SPI_handleTestCommand(spiRx.buf[5]);
+					    SPI_makeResponse(seq_no, SPI_ACK);
+					    break;
 					}
 				}
 				else
@@ -380,6 +402,8 @@ interrupt void spiATxISR(void)
 		spiTx.idx=0;
 		txLen=0;
 		for(i=0; i<20; i++) spiTx.buf[i]=0;
+
+		if(reset_requested_f) reset_command_enabled_f = 1;
 
 #ifdef SUPPORT_COMM_MCU_STATE_
 		UTIL_setNotifyFlagMcu(MCU_COMM_READY_NOTI); // end of transmission

@@ -207,6 +207,8 @@ extern void MAIN_setDeviceConstant(void);
 
 extern void ERR_printTripInfo(void);
 
+extern uint16_t reset_requested_f;
+
 #ifdef SUPPORT_MISS_PHASE_DETECT
 #define I_MISS_SAMPLE_COUNT		50
 extern float_t i_buff[3][I_MISS_SAMPLE_COUNT];
@@ -2116,7 +2118,8 @@ STATIC int dbg_tmpTest(int argc, char *argv[])
     }
     else if(index == 9)
     {
-
+        reset_requested_f=1;
+        UARTprintf(" reset by WDT \n");
     }
     else if(index == 'g')
     {

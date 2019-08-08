@@ -57,6 +57,12 @@ extern "C"
 #define SPICMD_RESP_ERR		(0x0400)
 #define SPICMD_RESP_PARAM	(0x0800)
 
+#define SPICMD_TEST_CMD   (0x1000)
+
+
+// test mode command
+#define SPI_TEST_CMD_TEST_MODE  0
+#define SPI_TEST_CMD_RESET      1
 
 //*****************************************************************************
 //

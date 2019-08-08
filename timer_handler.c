@@ -49,6 +49,9 @@ typedef struct
  * LOCAL VARIABLES
  */
 
+uint16_t reset_command_enabled_f=0; // flag for SPI response done
+uint16_t delay_cnt=0;
+
 uint32_t on_time=0;
 uint32_t run_time=0;
 
@@ -319,7 +322,16 @@ interrupt void timer0ISR(void)
 
 #ifdef SUPPORT_WATCHDOG
 	if(gTimerCount%100 == 0) // 100ms kick
-		HAL_kickWdog(halHandle);
+	{
+	    if(reset_command_enabled_f == 0)
+	        HAL_kickWdog(halHandle);
+	    else
+	    {
+	        delay_cnt++;
+	        if(delay_cnt < 5) // delay 500 ms
+	            HAL_kickWdog(halHandle);
+	    }
+	}
 #endif
 
 #ifdef SUPPORT_AUTO_LOAD_TEST // only for test without debug connection
