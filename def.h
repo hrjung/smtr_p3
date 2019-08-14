@@ -27,9 +27,6 @@
 // SPI communication for DSP <-> MCU
 #define SUPPORT_SPI_INTERRUPT
 
-// SPI communication for accelerometer : move to MCU
-//#define SUPPORT_SPI_ACCELEROMETER
-
 #define SUPPORT_COMM_MCU_STATE
 
 #define SUPPORT_VF_CONTROL
@@ -107,6 +104,9 @@
 
 //for cycle test with load, forward <-> reverse rotation
 //#define SUPPORT_AUTO_LOAD_TEST
+
+// test code for production test
+#define SUPPORT_PRODUCTION_TEST_MODE
 
 
 #ifdef SUPPORT_V0_HW

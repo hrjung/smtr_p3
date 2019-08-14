@@ -849,11 +849,6 @@ void HAL_setParams(HAL_Handle handle,const USER_Params *pUserParams)
   HAL_setupQEP(handle,HAL_Qep_QEP1);
 #endif
 
-#ifdef SUPPORT_SPI_ACCELEROMETER
-  // setup the spiB
-  HAL_setupSpiB(handle);
-#endif
-
   // setup the PWM DACs
   HAL_setupPwmDacs(handle);
 
@@ -2083,26 +2078,6 @@ void HAL_setupQEP(HAL_Handle handle,HAL_QepSelect_e qep)
 }
 #endif
 
-#ifdef SUPPORT_SPI_ACCELEROMETER
-void HAL_setupSpiB(HAL_Handle handle)
-{
-  HAL_Obj   *obj = (HAL_Obj *)handle;
-
-  SPI_reset(obj->spiBHandle);
-  SPI_setMode(obj->spiBHandle,SPI_Mode_Master);
-  SPI_setClkPolarity(obj->spiBHandle,SPI_ClkPolarity_OutputRisingEdge_InputFallingEdge);
-  SPI_enableTx(obj->spiBHandle);
-  SPI_enableTxFifoEnh(obj->spiBHandle);
-  SPI_enableTxFifo(obj->spiBHandle);
-  SPI_setTxDelay(obj->spiBHandle,0);
-  SPI_setBaudRate(obj->spiBHandle,(SPI_BaudRate_e)(0x0017)); // 8 for 10MHz, 17 for 5Mhz, 29 for 3MHz
-  SPI_setCharLength(obj->spiBHandle,SPI_CharLength_8_Bits);
-  SPI_setSuspend(obj->spiBHandle,SPI_TxSuspend_free);
-  SPI_enable(obj->spiBHandle);
-
-  return;
-}  // end of HAL_setupSpiB() function
-#endif
 
 void HAL_setupPwmDacs(HAL_Handle handle)
 {

@@ -387,7 +387,7 @@ extern "C" {
 #define SAMYANG_2_2K_4P_MOTOR		320
 
 
-#define USER_MOTOR 				SAMYANG_2_2K_4P_MOTOR
+#define USER_MOTOR 				SAMYANG_1_5K_4P_MOTOR
 
 #define USER_MOTOR_TYPE                 MOTOR_Type_Induction
 #define USER_MOTOR_NUM_POLE_PAIRS       (2)

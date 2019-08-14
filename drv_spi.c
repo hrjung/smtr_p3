@@ -45,6 +45,10 @@ uint16_t spi_find_first=0, spi_chk_ok=0;
 uint16_t spi_checksum=0;
 uint16_t spi_rcv_cmd=0;
 
+#ifdef SUPPORT_PRODUCTION_TEST_MODE
+extern uint16_t production_test_mode_f;
+#endif
+
 uint16_t reset_requested_f=0;
 extern uint16_t reset_command_enabled_f;
 extern HAL_Handle halHandle;
@@ -237,7 +241,9 @@ inline void SPI_handleTestCommand(uint16_t cmd)
     switch(cmd)
     {
     case SPI_TEST_CMD_TEST_MODE:
-
+#ifdef SUPPORT_PRODUCTION_TEST_MODE
+        production_test_mode_f = 1;
+#endif
         break;
 
     case SPI_TEST_CMD_RESET:
@@ -416,71 +422,6 @@ interrupt void spiATxISR(void)
 
 }
 
-
-#ifdef SUPPORT_SPI_ACCELEROMETER
-//function for reading from spi
-uint16_t SPI_readSensor(uint16_t regNum, uint16_t *rxData)
-{
-    volatile uint16_t WaitTimeOut = 0;
-    volatile SPI_FifoStatus_e RxFifoCnt = SPI_FifoStatus_Empty;
-    uint16_t ret=0;
-
-    // reset the Rx fifo pointer to zero
-    SPI_resetRxFifo(halHandle->spiBHandle);
-    SPI_enableRxFifo(halHandle->spiBHandle);
-
-    // write the address
-    SPI_write(halHandle->spiBHandle, (regNum | 0x80)<<8); // read and single
-    SPI_write(halHandle->spiBHandle, 0); // dummy write to read 1byte
-
-	// wait for two words to populate the RX fifo, or a wait timeout will occur
-	while((RxFifoCnt < SPI_FifoStatus_2_Words) && (WaitTimeOut < 0xff))
-	{
-		RxFifoCnt = SPI_getRxFifoStatus(halHandle->spiBHandle);
-		WaitTimeOut++;
-	}
-
-	if(WaitTimeOut >= 0xff)
-		ret = 1;
-	else
-	{
-	    // Read two words, the dummy word and the data
-		rxData[0] = SPI_read(halHandle->spiBHandle);
-		rxData[1] = SPI_read(halHandle->spiBHandle);
-	}
-
-	return ret;
-}
-
-uint16_t SPI_writeSesnsor(uint16_t *txData)
-{
-    volatile uint16_t WaitTimeOut = 0;
-    volatile SPI_FifoStatus_e TxFifoCnt;
-    uint16_t ret=0;
-
-    // reset the Rx fifo pointer to zero
-    SPI_resetTxFifo(halHandle->spiBHandle);
-    SPI_enableTxFifo(halHandle->spiBHandle);
-
-	//write address
-	SPI_write(halHandle->spiBHandle, (txData[0]<<8)&0xFF00);
-	//write data
-	SPI_write(halHandle->spiBHandle, (txData[1]<<8)&0xFF00);
-
-	TxFifoCnt = SPI_getTxFifoStatus(halHandle->spiBHandle);
-    while((TxFifoCnt != SPI_FifoStatus_Empty) && (WaitTimeOut < 0xff))
-    {
-        TxFifoCnt = SPI_getTxFifoStatus(halHandle->spiBHandle);
-        WaitTimeOut++;
-    }
-
-    if(WaitTimeOut >= 0xff)
-    	ret = 1;
-
-    return ret;
-}
-
-#endif
 
 //*****************************************************************************
 //

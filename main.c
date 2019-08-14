@@ -315,6 +315,10 @@ extern uint16_t unit_test_running;
 uint16_t pwm_freq_updated=0;
 #endif
 
+#ifdef SUPPORT_PRODUCTION_TEST_MODE
+extern uint16_t production_test_mode_f;
+#endif
+
 extern uint32_t secCnt;
 
 extern uint16_t spi_chk_ok, rx_seq_no;
@@ -557,6 +561,8 @@ float_t MAIN_getIave(void)
 
 	ave = (internal_status.Irms[0] + internal_status.Irms[1] + internal_status.Irms[2])/3.0;
 
+	internal_status.Iave = ave;
+
 	return ave;
 }
 
@@ -590,8 +596,8 @@ inline int MAIN_getSampleCountLimit(void)
 	freq = STA_getCurFreq();
 
 #ifdef SUPPORT_VAR_PWM_FREQ
-	if(freq < 1.0)
-		return (int)(gUserParams.pwmPeriod_kHz*1000.0/(60.0*(float_t)I_RMS_SAMPLE_COUNT));
+	if(freq < 10.0)
+		return (int)(gUserParams.pwmPeriod_kHz*1000.0/(10.0*(float_t)I_RMS_SAMPLE_COUNT));
 	else
 		return (int)(gUserParams.pwmPeriod_kHz*1000.0/(freq*(float_t)I_RMS_SAMPLE_COUNT));
 #else
@@ -989,6 +995,8 @@ void MAIN_initInternalVariable(void)
     internal_status.Irms[1] = 0.0;
     internal_status.Irms[2] = 0.0;
 
+    internal_status.Iave = 0.0;
+
     internal_status.Vrms[0] = 0.0;
     internal_status.Vrms[1] = 0.0;
     internal_status.Vrms[2] = 0.0;
@@ -1049,6 +1057,8 @@ void MAIN_setDeviceConstant(void)
 	MPARAM_updateDevConst();
 
 	FREQ_updateJumpSpeed();
+
+	FREQ_setMaxFreqValue(iparam[MAX_FREQ_INDEX].value.f); // accel time initialize
 
 	// variable setting from parameter
 	if(iparam[DIRECTION_INDEX].value.l == 0)
@@ -1547,9 +1557,9 @@ void main(void)
   datalog.iptr[0] = &Id_in;//&pwm_set[0];	// &gAdcData.V.value[0];
   datalog.iptr[1] = &Iq_in; //&pwm_set[1];	//&gAdcData.I.value[0];
 #endif
-  datalog.iptr[0] = &gAdcData.I.value[0];  // U
-  datalog.iptr[1] = &gAdcData.I.value[1];  // V &angle_pu
-  datalog.iptr[2] = &gAdcData.I.value[2];  // W
+  datalog.iptr[0] = &gAdcData.V.value[0];  // U
+  datalog.iptr[1] = &gAdcData.V.value[1];  // V &angle_pu
+  datalog.iptr[2] = &gAdcData.V.value[2];  // W
 
   datalog.Flag_EnableLogData = true;
   datalog.Flag_EnableLogOneShot = false;
@@ -2949,8 +2959,9 @@ uint16_t UTIL_readMotorTemperatureStatus(void)
 	else if(motor_temp <= MOTOR_TEMP_WARN_ADC_LEVEL && motor_temp > MOTOR_TEMP_TRIP_ADC_LEVEL)
 		return 1;
 	else
-		return 2;
+		return 2; // trip
 }
+
 
 #ifdef SUPPORT_AUTO_LOAD_TEST
 bool UTIL_readSwGpio(void)
@@ -2976,23 +2987,6 @@ int TEST_readSwitch(void)
 		return 0;
 	else
 		return 2; // ignore
-}
-
-void test_startRun(void)
-{
-    cmd_type_st que_data;
-
-    que_data.cmd = SPICMD_CTRL_RUN;
-    que_data.index = INV_RUN_STOP_CMD_INDEX;
-    que_data.data.l = 0;
-    if(!QUE_isFull())
-    {
-        QUE_putCmd(que_data);
-    }
-    else
-    {
-        UARTprintf("QUE_full !!\n");
-    }
 }
 
 void processAutoLoadTest(void)

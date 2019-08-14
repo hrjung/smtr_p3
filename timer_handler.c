@@ -18,6 +18,9 @@
 #include "timer_handler.h"
 #include "err_trip.h"
 #include "common_tools.h"
+#ifdef SUPPORT_PRODUCTION_TEST_MODE
+#include "production_test.h"
+#endif
 
 #ifdef FLASH
 #pragma CODE_SECTION(timer0ISR,"ramfuncs");
@@ -84,8 +87,8 @@ extern int TEMP_monitorTemperature(void);
 
 uint16_t wd_count=0;
 
-#ifdef SUPPORT_AUTO_LOAD_TEST
-extern void test_startRun(void);
+#ifdef SUPPORT_PRODUCTION_TEST_MODE
+extern uint16_t production_test_mode_f;
 #endif
 
 #ifdef SUPPORT_MISS_PHASE_DETECT
@@ -308,10 +311,12 @@ interrupt void timer0ISR(void)
 	{
 		if(gTimerCount%1000 == 0)
 		{
+#if 0
 #ifdef SUPPORT_P3_HW
 			HAL_toggleGpio(halHandle,(GPIO_Number_e)HAL_Gpio_Test0);
 #else
 			HAL_toggleLed(halHandle,(GPIO_Number_e)HAL_Gpio_LED3);
+#endif
 #endif
 		}
 	}
@@ -331,6 +336,13 @@ interrupt void timer0ISR(void)
 	        if(delay_cnt < 5) // delay 500 ms
 	            HAL_kickWdog(halHandle);
 	    }
+	}
+#endif
+
+#ifdef SUPPORT_PRODUCTION_TEST_MODE
+	if(production_test_mode_f)
+	{
+	    processProductionMotorTest();
 	}
 #endif
 
@@ -414,6 +426,7 @@ interrupt void timer0ISR(void)
 		temp_flag=0;
 
 	// read MCU error
+#if 0
 	if(gTimerCount%30 == 0 && secCnt > 50) // every 30 ms, delay 5 sec
 	{
 	    if(UTIL_isMcuError())
@@ -421,6 +434,7 @@ interrupt void timer0ISR(void)
 	        ERR_setTripFlag(TRIP_REASON_MCU_ERR);
 	    }
 	}
+#endif
 
 #ifdef SUPPORT_MISS_PHASE_DETECT
 	if(MAIN_isSystemEnabled())

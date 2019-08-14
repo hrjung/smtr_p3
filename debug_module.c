@@ -217,9 +217,13 @@ extern int v_low_cnt, v_high_cnt;
 extern int w_low_cnt, w_high_cnt;
 #endif
 
-#ifdef SUPPORT_SPI_ACCELEROMETER
-extern uint16_t SPI_readSensor(uint16_t regNum, uint16_t *rxData);
-extern uint16_t SPI_writeSesnsor(uint16_t *txData);
+#ifdef SUPPORT_PRODUCTION_TEST_MODE
+extern uint16_t production_test_mode_f;
+
+extern void setGPIOTestMode(void);
+
+extern void processProductionBasicTest(void);
+extern void processProductionMotorTest(void);
 #endif
 
 #ifdef SUPPORT_AUTO_LOAD_TEST_
@@ -564,9 +568,9 @@ STATIC void dbg_showMonitorParam(void)
 
 	UARTprintf("\t Iu: %f, Iv: %f, Iw: %f, DC_V: %f\n", MAIN_getIu(), MAIN_getIv(), MAIN_getIw(), MAIN_getVdcBus());
 	UARTprintf("\t RMS Iu: %f, Iv: %f, Iw: %f, Iave: %f \n", internal_status.Irms[0], internal_status.Irms[1], internal_status.Irms[2], m_status.current);
-//	UARTprintf("\t RMS Vu: %f, Vv: %f, Vw: %f\n", internal_status.Vrms[0], internal_status.Vrms[1], internal_status.Vrms[2]);
+	UARTprintf("\t RMS Vu: %f, Vv: %f, Vw: %f\n", internal_status.Vrms[0], internal_status.Vrms[1], internal_status.Vrms[2]);
 //	UARTprintf("\t RMS Vppu: %f, Vppv: %f, Vppw: %f\n", (float)internal_status.Vpprms[0], (float)internal_status.Vpprms[1], (float)internal_status.Vpprms[2]);
-//	UARTprintf("\t Volt: Vu: %f, Vv: %f, Vw: %f \n", internal_status.Vu_inst, internal_status.Vv_inst, internal_status.Vw_inst); //, MAIN_getDC_lfp());
+	UARTprintf("\t Volt: Vu: %f, Vv: %f, Vw: %f \n", internal_status.Vu_inst, internal_status.Vv_inst, internal_status.Vw_inst); //, MAIN_getDC_lfp());
 //	UARTprintf("\t Volt: U-V: %f, V-W: %f, W-U: %f \n", (internal_status.Vu_inst - internal_status.Vv_inst), (internal_status.Vv_inst-internal_status.Vw_inst), (internal_status.Vw_inst-internal_status.Vu_inst));
 	UARTprintf("\t Motor RPM: %f  Freq: %f,  target %f, dir=%d \n", STA_getCurSpeed(), m_status.cur_freq, m_status.target_freq, (int)m_status.direction);
 	UARTprintf("\t Motor status %d, accel: %f  decel: %f \n", m_status.status, m_status.acc_res, m_status.dec_res);
@@ -2180,31 +2184,41 @@ STATIC int dbg_tmpTest(int argc, char *argv[])
 		UARTprintf("hi  cnt: %d, %d, %d \n", u_high_cnt, v_high_cnt, w_high_cnt);
 	}
 #endif
-#ifdef SUPPORT_SPI_ACCELEROMETER
-    else if(index == 'a')
-    {
-    	int ret=0;
-    	uint16_t data[2]= {0,0};
-
-    	ret = SPI_readSensor(0x20, data);
-    	UARTprintf(" accel ret=%d, data0=%d, data1=%d \n", ret, data[0], data[1]);
-    }
+#ifdef SUPPORT_PRODUCTION_TEST_MODE
+#if 1 //
     else if(index == 'b')
     {
-    	int ret=0;
-    	uint16_t data[2]= {0x20,0xA5};
-
-    	ret = SPI_writeSesnsor(data);
-    	UARTprintf(" accel write, ret=%d, data0=%d, data1=%d \n", ret, data[0], data[1]);
+        processProductionBasicTest();
+        UARTprintf(" run basic production test\n");
     }
-    else if(index == 'c') // read who am i register -> 51
+    else if(index == 'c')
     {
-    	int ret=0;
-    	uint16_t data[2]= {0,0};
-
-    	ret = SPI_readSensor(0xF, data);
-    	UARTprintf(" accel read 51, ret=%d, data0=%d, data1=%d \n", ret, data[0], data[1]);
+        //processProductionMotorTest();
+        production_test_mode_f = 1;
+        UARTprintf(" run motor production test\n");
     }
+#else // GPIO re-initialize test
+    else if(index == 'b')
+    {
+        bool rd_val=false;
+
+        rd_val = HAL_readGpio(halHandle,(GPIO_Number_e)HAL_Gpio_Test0);
+        UARTprintf(" read Test0 pin =%d\n", (int)rd_val);
+    }
+    else if(index == 'c')
+    {
+        setGPIOTestMode();
+        UARTprintf(" set Test0 pin Input\n");
+    }
+    else if(index == 'y')
+    {
+        int wr_val;
+
+        wr_val = (int)atoi(argv[2]);
+        UTIL_testbit1(wr_val);
+        UARTprintf(" set Test1 pin %d\n", wr_val);
+    }
+#endif
 #endif
     else if(index == 'k')
     {

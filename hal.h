@@ -1296,12 +1296,6 @@ void HAL_setupPwmUser(HAL_Handle handle,
 //! \param[in] handle  The hardware abstraction layer (HAL) handle
 extern void HAL_setupQEP(HAL_Handle handle,HAL_QepSelect_e qep);
 
-#ifdef SUPPORT_SPI_ACCELEROMETER
-//! \brief     Sets up the spiB peripheral
-//! \param[in] handle  The hardware abstraction layer (HAL) handle
-extern void HAL_setupSpiB(HAL_Handle handle);
-#endif
-
 //! \brief     Sets up the timers
 //! \param[in] handle          The hardware abstraction layer (HAL) handle
 //! \param[in] systemFreq_MHz  The system frequency, MHz

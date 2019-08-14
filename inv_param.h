@@ -275,6 +275,8 @@ typedef struct
 	float_t 	Vrms[3];
 	float_t 	Vpprms[3];
 
+	float_t     Iave;
+
 	uint16_t	Iu_miss_cnt;
 	uint16_t	Iv_miss_cnt;
 	uint16_t	Iw_miss_cnt;
