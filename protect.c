@@ -50,14 +50,6 @@
 /*******************************************************************************
  * TYPEDEFS
  */
-// 220V
-#define DC_VOLTAGE_INIT_RELAY_OFF_220V		(100.0)
-#define DC_VOLTAGE_INIT_RELAY_ON_220V		(186.0)
-#define DC_VOLTAGE_OVER_TRIP_LEVEL_220V		(404.5)
-
-#define DC_VOLTAGE_START_REGEN_LEVEL_220V 	(373.4)
-#define DC_VOLTAGE_END_REGEN_LEVEL_220V		(357.8)
-
 // 380V
 #define DC_VOLTAGE_INIT_RELAY_OFF_380V		(100.0)
 #define DC_VOLTAGE_INIT_RELAY_ON_380V		(322.4)
@@ -230,7 +222,7 @@ int OVL_processOverloadWarning(float_t cur_val)
 			if(ovl_alarm_enable == 0)
 			{
 				UARTprintf("OVL ALARM set at %d\n", (int)(secCnt/10));
-				ovl_alarm_enable = 1; // TODO : set alarm
+				ovl_alarm_enable = 1;
 			}
 		}
 		break;
@@ -266,7 +258,7 @@ int OVL_processOverloadWarning(float_t cur_val)
 			if(ovl_alarm_enable)
 			{
 				UARTprintf("OVL ALARM cleared at %d\n", (int)(secCnt/10));
-				ovl_alarm_enable = 0; //TODO : clear alarm
+				ovl_alarm_enable = 0;
 			}
 		}
 		break;
@@ -451,6 +443,7 @@ void REGEN_end(void)
 	UTIL_setRegenPwmDuty(0);
 }
 
+// handling regeneration process
 int REGEN_process(float_t dc_volt)
 {
 	static int under_flag=0, over_flag=0, regen_flag=0; //, off_flag=0;
@@ -523,7 +516,7 @@ int REGEN_process(float_t dc_volt)
 	else
 		ov_volt_count=0;
 
-	if(dc_volt > protect_dc.dc_volt_start_regen_level)
+	if(dc_volt > protect_dc.dc_volt_start_regen_level) // regen active condition, out to regen resister
 	{
 		REGEN_active(dc_volt);
 		if(regen_flag==0)
@@ -536,38 +529,16 @@ int REGEN_process(float_t dc_volt)
 
 	if(REGEN_isEnabled())
 	{
-		if(dc_volt < protect_dc.dc_volt_end_regen_level)
+		if(dc_volt < protect_dc.dc_volt_end_regen_level) // regen off condition
 		{
 			UARTprintf("REGEN_end() DC=%f, duty=%d \n", dc_volt, regen_duty);
 			REGEN_end();
 			regen_flag=0;
 		}
-//		else
-//			REGEN_active(dc_volt);
 	}
 
 	return 0;
 }
-
-//bool ovTempWarn = 0;
-//bool ovTempFault = 0;
-////bool ipmFault = 0;
-//
-//int OSC_setDampImpact(int value)
-//{
-//	param.osc_damp.impact = value;
-//
-//	//return EEP_updateItem(OSC_DAMP_IMPACT_ADDR, (unsigned char *)&param.osc_damp.impact);
-//	return 0;
-//}
-//
-//int OSC_setDampFilter(int value)
-//{
-//	param.osc_damp.filter = value;
-//
-//	//return EEP_updateItem(OSC_DAMP_FILTER_ADDR, (unsigned char *)&param.osc_damp.filter);
-//	return 0;
-//}
 
 inline int TEMP_isFanOn(float_t ipm_temp)
 {
@@ -645,16 +616,7 @@ int TEMP_monitorTemperature(void)
 
 void PROT_init(int input)
 {
-	if(input == 220)
-	{
-		//protect_dc.dc_volt_init_relay_off = DC_VOLTAGE_INIT_RELAY_OFF_220V;
-		protect_dc.dc_volt_init_relay_on = DC_VOLTAGE_INIT_RELAY_ON_220V;
-		protect_dc.dc_volt_over_trip_level = DC_VOLTAGE_OVER_TRIP_LEVEL_220V;
-
-		protect_dc.dc_volt_start_regen_level = DC_VOLTAGE_START_REGEN_LEVEL_220V;
-		protect_dc.dc_volt_end_regen_level = DC_VOLTAGE_END_REGEN_LEVEL_220V;
-	}
-	else if(input == 380)
+    if(input == 380)
 	{
 		//protect_dc.dc_volt_init_relay_off = DC_VOLTAGE_INIT_RELAY_OFF_380V;
 		protect_dc.dc_volt_init_relay_on = DC_VOLTAGE_INIT_RELAY_ON_380V;
@@ -696,9 +658,7 @@ int processProtection(void)
 			trip_info.Irms = I_rms;
 			ERR_setTripFlag(TRIP_REASON_OVERLOAD);
 			// set trip error code
-			// disable PWM output
-//			MAIN_disableSystem();
-//
+
 			evt_flag++;
 			if(evt_flag == 1)
 				UARTprintf("OVL trip event happened at %d\n", (int)(secCnt/10));
@@ -709,7 +669,7 @@ int processProtection(void)
 			ERR_setTripInfo();
 			trip_info.Irms = I_rms;
 			ERR_setTripFlag(TRIP_REASON_OVER_CURRENT);
-//			MAIN_disableSystem();
+
 			evt_flag++;
 			if(evt_flag == 1)
 				UARTprintf("OV Current trip event happened at %d\n", (int)(secCnt/10));

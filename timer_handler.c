@@ -52,7 +52,7 @@ typedef struct
  * LOCAL VARIABLES
  */
 
-uint16_t reset_command_enabled_f=0; // flag for SPI response done
+uint16_t reset_command_enabled_f=0; // flag for SPI response done, than start reset procecure
 uint16_t delay_cnt=0;
 
 uint32_t on_time=0;
@@ -330,10 +330,10 @@ interrupt void timer0ISR(void)
 	{
 	    if(reset_command_enabled_f == 0)
 	        HAL_kickWdog(halHandle);
-	    else
+	    else // for reset process, only WDT reset is available as SW reset
 	    {
 	        delay_cnt++;
-	        if(delay_cnt < 5) // delay 500 ms
+	        if(delay_cnt < 5) // delay 500 ms for reset
 	            HAL_kickWdog(halHandle);
 	    }
 	}
@@ -342,7 +342,8 @@ interrupt void timer0ISR(void)
 #ifdef SUPPORT_PRODUCTION_TEST_MODE
 	if(production_test_mode_f)
 	{
-	    processProductionMotorTest();
+	    processProductionConstantDutyTest();
+	    //processProductionMotorTest();
 	}
 #endif
 
@@ -415,10 +416,11 @@ interrupt void timer0ISR(void)
 		}
 	}
 
+	// IPM, Motor temperature check
 	if(secCnt%5 == 0 && secCnt > 50) //every 0.5 sec after 5 sec
 	{
 		if(temp_flag == 0)
-			TEMP_monitorTemperature(); // IPM, Motor temperature check
+			TEMP_monitorTemperature();
 
 		temp_flag++;
 	}
@@ -456,6 +458,7 @@ interrupt void timer0ISR(void)
 	}
 #endif
 
+	// only timer event generated
 	if(time_sig[DCI_BRAKE_SIG_ON_TSIG].enable)
 	{
 		if(TMR_isTimeOutCondition(DCI_BRAKE_SIG_ON_TSIG))
@@ -497,7 +500,6 @@ interrupt void timer0ISR(void)
 		if(TMR_isTimeOutCondition(OVERLOAD_TRIP_TSIG))
 		{
 			time_sig[OVERLOAD_TRIP_TSIG].timeout_flag = 1;
-//			MAIN_disableSystem();
 		}
 	}
 
@@ -506,7 +508,6 @@ interrupt void timer0ISR(void)
 		if(TMR_isTimeOutCondition(OVERLOAD_OVC_TSIG))
 		{
 			time_sig[OVERLOAD_OVC_TSIG].timeout_flag = 1;
-//			MAIN_disableSystem();
 		}
 	}
 

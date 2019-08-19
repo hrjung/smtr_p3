@@ -219,17 +219,14 @@ extern int w_low_cnt, w_high_cnt;
 
 #ifdef SUPPORT_PRODUCTION_TEST_MODE
 extern uint16_t production_test_mode_f;
+extern uint16_t p_test_i_ave_f;
+
+extern float_t MAIN_getVave(void);
 
 extern void setGPIOTestMode(void);
 
-extern void processProductionBasicTest(void);
+//extern void processProductionBasicTest(void);
 extern void processProductionMotorTest(void);
-#endif
-
-#ifdef SUPPORT_AUTO_LOAD_TEST_
-int ipm_disp_on = 0;
-extern bool UTIL_readSwGpio(void);
-extern int TEST_readSwitch(void);
 #endif
 
 #ifdef UNIT_TEST_ENABLED
@@ -2188,7 +2185,7 @@ STATIC int dbg_tmpTest(int argc, char *argv[])
 #if 1 //
     else if(index == 'b')
     {
-        processProductionBasicTest();
+        //processProductionBasicTest();
         UARTprintf(" run basic production test\n");
     }
     else if(index == 'c')
@@ -2196,6 +2193,10 @@ STATIC int dbg_tmpTest(int argc, char *argv[])
         //processProductionMotorTest();
         production_test_mode_f = 1;
         UARTprintf(" run motor production test\n");
+    }
+    else if(index == 'y')
+    {
+        //UARTprintf(" constant PWM Vrms==%f\n", test_Vrms);
     }
 #else // GPIO re-initialize test
     else if(index == 'b')
@@ -2298,29 +2299,6 @@ STATIC int dbg_tmpTest(int argc, char *argv[])
     		gFlag_LogEnabled = 0;
     	}
     }
-#ifdef SUPPORT_AUTO_LOAD_TEST_
-    else if(index == 'l')
-    {
-        bool sw_state=0;
-        int btn_state=0;
-        sw_state = UTIL_readSwGpio();
-        btn_state = TEST_readSwitch();
-        UARTprintf(" test SW %d btn %d\n", (int)sw_state, (int)btn_state);
-    }
-    else if(index == 'i')
-    {
-    	int enable;
-
-    	enable = atoi(argv[2]);
-    	if(enable)
-    		ipm_disp_on = 1;
-    	else
-    		ipm_disp_on = 0;
-
-    	UARTprintf(" IPM temperature periodic display enable=%d\n", ipm_disp_on);
-    }
-#endif
-
 #ifdef PWM_DUTY_TEST
     else if(index == 'p')
     {

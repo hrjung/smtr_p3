@@ -474,6 +474,14 @@ float_t STA_getDecelResolution(void)
 	return m_status.dec_res;
 }
 
+// for steady speed running
+int STA_isConstantRun(void)
+{
+    if(m_status.status == STATE_RUN) return 1;
+
+    return 0;
+}
+
 void STA_printInvState(void)
 {
 	UARTprintf("speed curr_freq=%f, target_freq=%f\n", m_status.cur_freq, m_status.target_freq);
@@ -512,6 +520,7 @@ void STA_setResolution(int flag, float_t value)
 	}
 }
 
+// calculate acceleration/deceleration rate
 void STA_calcResolution(void)
 {
 	float_t time;
@@ -551,11 +560,6 @@ void STA_calcResolution4Reverse(float_t run_freq)
 	time = iparam[DECEL_TIME_INDEX].value.f;
 	STA_setResolution(DECEL, DRV_calculateAccelRate_krpm(time, diff));
 }
-
-//int STA_isSameAccelRate(void)
-//{
-//	return (m_status.acc_res == m_status.dec_res);
-//}
 
 
 float_t STA_getTrajResolution(void)

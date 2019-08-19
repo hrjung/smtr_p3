@@ -285,6 +285,8 @@ typedef struct
 	float_t		Vv_inst;
 	float_t		Vw_inst;
 
+	float_t     Vave;
+
 	float_t		Vab_pu[2];
 	float_t 	Vdc_inst;
 	float_t 	Vdc_lfp;

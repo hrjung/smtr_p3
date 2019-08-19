@@ -566,6 +566,17 @@ float_t MAIN_getIave(void)
 	return ave;
 }
 
+float_t MAIN_getVave(void)
+{
+    float_t ave;
+
+    ave = (internal_status.Vrms[0] + internal_status.Vrms[1] + internal_status.Vrms[2])/3.0;
+
+    internal_status.Vave = ave;
+
+    return ave;
+}
+
 inline void MAIN_readCurrent(void)
 {
 	float_t current_limit = USER_MOTOR_RATED_CURRENT*4.5;
@@ -2398,6 +2409,8 @@ interrupt void mainISR(void)
   //UTIL_testbit(0);
 
 #if 1
+    MAIN_getVave();
+
     Vinst[0] = gAdcData.v_adc[0];
     Vinst[1] = gAdcData.v_adc[1];
     Vinst[2] = gAdcData.v_adc[2];
@@ -2867,6 +2880,11 @@ float_t MAIN_getPwmFrequency(void)
 #else
 	return USER_PWM_FREQ_kHz;
 #endif
+}
+
+void UTIL_setTestPwmDuty(void)
+{
+    gPwmData_Value = _IQ(0.3);
 }
 
 // for SUPPORT_P3_HW GPIO changed to active Low

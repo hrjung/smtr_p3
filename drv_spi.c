@@ -49,7 +49,7 @@ uint16_t spi_rcv_cmd=0;
 extern uint16_t production_test_mode_f;
 #endif
 
-uint16_t reset_requested_f=0;
+uint16_t reset_requested_f=0; // reset command received flag
 extern uint16_t reset_command_enabled_f;
 extern HAL_Handle halHandle;
 
@@ -159,6 +159,7 @@ void SPI_enableInterrupt(void)
 	  CPU_enableInt(halHandle->cpuHandle, CPU_IntNumber_6);
 }
 
+// status info response packet
 inline void SPI_makeStatusResponse(uint16_t seq_no)
 {
 	uint16_t i, checksum=0, size;
@@ -172,12 +173,13 @@ inline void SPI_makeStatusResponse(uint16_t seq_no)
 	txLen = 6+size;
 	buf[2] = txLen; //18
 
-	for(i=0; i<txLen-1; i++) checksum += buf[i]; // except header
+	for(i=0; i<txLen-1; i++) checksum += buf[i];
 	buf[txLen-1] = checksum;
 
 	for(i=0; i<txLen; i++) spiTx.buf[i] = buf[i];
 }
 
+// error info response packet
 inline void SPI_makeErrorResponse(uint16_t seq_no)
 {
 	uint16_t i, checksum=0, size;
@@ -191,12 +193,13 @@ inline void SPI_makeErrorResponse(uint16_t seq_no)
 	txLen = 6+size;
 	buf[2] = txLen; //12
 
-	for(i=0; i<txLen-1; i++) checksum += buf[i]; // except header
+	for(i=0; i<txLen-1; i++) checksum += buf[i];
 	buf[txLen-1] = checksum;
 
 	for(i=0; i<txLen; i++) spiTx.buf[i] = buf[i];
 }
 
+// response packet of read param
 inline void SPI_makeParamResponse(uint16_t seq_no, uint16_t index)
 {
 	uint16_t i, checksum=0, size;
@@ -211,12 +214,13 @@ inline void SPI_makeParamResponse(uint16_t seq_no, uint16_t index)
 	txLen = 7+size;
 	buf[2] = txLen; //9
 
-	for(i=0; i<txLen-1; i++) checksum += buf[i]; // except header
+	for(i=0; i<txLen-1; i++) checksum += buf[i];
 	buf[txLen-1] = checksum;
 
 	for(i=0; i<txLen; i++) spiTx.buf[i] = buf[i];
 }
 
+// ACK, NAK
 inline void SPI_makeResponse(uint16_t seq_no, uint16_t resp)
 {
 	uint16_t i, checksum=0;
@@ -230,12 +234,13 @@ inline void SPI_makeResponse(uint16_t seq_no, uint16_t resp)
 	buf[4] = SPICMD_RESP_ACK;
 	buf[5] = resp;
 
-	for(i=0; i<txLen-1; i++) checksum += buf[i]; // except header
+	for(i=0; i<txLen-1; i++) checksum += buf[i];
 	buf[txLen-1] = checksum;
 	for(i=0; i<txLen; i++) spiTx.buf[i] = buf[i];
 
 }
 
+// command for production test or additional command
 inline void SPI_handleTestCommand(uint16_t cmd)
 {
     switch(cmd)
@@ -265,7 +270,6 @@ interrupt void spiARxISR(void)
 		if(spiRx.idx == 0 && data == 0xAAAA)
 		{
 			spiRx.buf[spiRx.idx++]=data;
-
 		}
 		else if(spiRx.idx == 1 && data == 0x5555 && spiRx.buf[0] == 0xAAAA)
 		{
@@ -329,7 +333,7 @@ interrupt void spiARxISR(void)
 						spi_chk_ok=0; //  queue is full
 
 				}
-				else if(cmd&0x10E0) // status request, respond now + test command
+				else if(cmd&0x10E0) // request, respond now + test command
 				{
 					spi_rcv_cmd = cmd&0x10E0;
 					switch(spi_rcv_cmd)
@@ -409,7 +413,7 @@ interrupt void spiATxISR(void)
 		txLen=0;
 		for(i=0; i<20; i++) spiTx.buf[i]=0;
 
-		if(reset_requested_f) reset_command_enabled_f = 1;
+		if(reset_requested_f) reset_command_enabled_f = 1; // notify after response
 
 #ifdef SUPPORT_COMM_MCU_STATE_
 		UTIL_setNotifyFlagMcu(MCU_COMM_READY_NOTI); // end of transmission

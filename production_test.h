@@ -12,6 +12,6 @@
 extern void test_startRun(void);
 extern void test_stopRun(void);
 
-extern void processProductionBasicTest(void);
+extern void processProductionConstantDutyTest(void);
 extern void processProductionMotorTest(void);
 #endif /* PRODUCTION_TEST_H_ */
