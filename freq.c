@@ -8,7 +8,6 @@
 
 #include "uartstdio.h"
 #include "parameters.h"
-//#include "inv_param.h"
 #include "freq.h"
 #include "state_func.h"
 #include "drive.h"
@@ -57,16 +56,10 @@
  * EXTERNS
  */
 
-// TODO : add checking working state for avoid change param in running
 
 /*
  *  ======== local function ========
  */
-
-//int FREQ_isJumpFreqUsed(int index)
-//{
-//	return (int)iparam[JMP_ENABLE_BASE + index].value.l;
-//}
 
 
 STATIC int FREQ_isInJumpFreq(float_t value)
@@ -276,7 +269,4 @@ float_t FREQ_getVarifiedFreq(float_t current, float_t target)
 
 	return value;
 }
-
-
-
 

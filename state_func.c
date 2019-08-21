@@ -85,6 +85,7 @@ extern uint32_t secCnt;
  * EXTERNS
  */
 //extern void initParam(void);
+extern int MAIN_isSystemEnabled(void);
 extern int MAIN_isDirectionReversed(void);
 
 /*
@@ -217,7 +218,7 @@ STATIC mtr_state_e func_stop(void)
 	}
 
 
-	if(STA_isAccelStateCond())
+	if(STA_isAccelStateCond() && MAIN_isSystemEnabled())
 		state = STATE_ACCEL;
 
 	if(state != STATE_STOP)
@@ -247,7 +248,7 @@ STATIC mtr_state_e func_accel(void)
 
 	if(STA_isRunStateCond())
 		state = STATE_RUN;
-	else if(STA_isDecelStateCond())
+	else if(STA_isDecelStateCond() && MAIN_isSystemEnabled())
 		state = STATE_DECEL;
 
 	if(state != STATE_ACCEL) first=1;
@@ -272,7 +273,7 @@ STATIC mtr_state_e func_decel(void)
 
 	if(STA_isRunStateCond())
 		state = STATE_RUN;
-	else if(STA_isStopStateCond())
+	else if(STA_isStopStateCond() && !MAIN_isSystemEnabled())
 		state = STATE_STOP;
 	else if(STA_isAccelStateCond())
 		state = STATE_ACCEL;

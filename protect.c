@@ -596,7 +596,7 @@ int TEMP_monitorTemperature(void)
 	else
 		ipm_count=0;
 
-#if 0
+#if 1
 	mtr_temp = UTIL_readMotorTemperatureStatus();
 	if(mtr_temp == 2) // Motor temperature trip
 	{
@@ -648,12 +648,12 @@ int processProtection(void)
 	{
 		I_rms = MAIN_getIave();
 
+		// check overload
 		OVL_processOverloadWarning(I_rms);
 
 		if(OVL_processOverloadTrip(I_rms))
 		{
 			// overload trip enabled
-			// trip signal generate
 			ERR_setTripInfo();
 			trip_info.Irms = I_rms;
 			ERR_setTripFlag(TRIP_REASON_OVERLOAD);
@@ -664,6 +664,7 @@ int processProtection(void)
 				UARTprintf("OVL trip event happened at %d\n", (int)(secCnt/10));
 		}
 
+		// check over current
 		if(OVL_processOverCurrentTrip(I_rms))
 		{
 			ERR_setTripInfo();
@@ -677,6 +678,7 @@ int processProtection(void)
 	}
 #endif
 
+	// check regen and DC over voltage
 	if( REGEN_process(MAIN_getVdcBus()) ) MAIN_disableSystem();
 
 	return 0;

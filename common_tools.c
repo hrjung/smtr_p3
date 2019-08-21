@@ -43,6 +43,7 @@ extern HAL_Handle halHandle;
 extern uint16_t comm_mcu_status;
 #endif
 
+// array for MTD bit to avoid glitch
 uint16_t mcu_err_val[MCU_ERROR_SAMPLE_CNT];
 
 //*****************************************************************************
@@ -160,6 +161,7 @@ bool UTIL_readMcuError(void)
     return HAL_readGpio(halHandle,(GPIO_Number_e)HAL_Gpio_MCU_ERR);
 }
 
+// read 16 samples to avoid glitch
 uint16_t UTIL_isMcuError(void)
 {
     static int err_idx=0;

@@ -569,33 +569,6 @@ int PARAM_setJumpFreqHigh2(union32_st value)
 	return result;
 }
 
-#if 0
-int PARAM_setVoltageBoost(union32_st value)
-{
-	float_t fdata = value.f;
-	int result;
-
-	if(MAIN_isSystemEnabled()) return 1;
-
-	//TODO : need implementation
-	result = DRV_setVoltageBoost(fdata);
-	UARTprintf("set voltage boost %f is %s\n", fdata, res_str[result]);
-
-	return result;
-}
-
-
-int PARAM_setTorqueLimit(union32_st value)
-{
-	float_t fdata = value.f;
-	int result;
-
-	result = DRV_setTorqueLimit(fdata);
-
-	return result;
-}
-#endif
-
 int PARAM_setBrakeType(union32_st value)
 {
 	uint32_t ldata = value.l;
@@ -726,47 +699,6 @@ int PARAM_setOvlTripTime(union32_st value)
 
 	return result;
 }
-
-#if 0
-int PARAM_setRegenResistance(union32_st value)
-{
-	float_t fdata = value.f;
-	int result;
-
-	if(MAIN_isSystemEnabled()) return 1;
-
-	result = REGEN_setRegenResistance(fdata);
-	UARTprintf("set regen resistance %f ohm is %s\n", fdata, res_str[result]);
-
-	return result;
-}
-
-int PARAM_setRegenResistThermal(union32_st value)
-{
-	float_t fdata = value.f;
-	int result;
-
-	if(MAIN_isSystemEnabled()) return 1;
-
-	result = REGEN_setRegenThermal(fdata);
-	UARTprintf("set regen thermal %f is %s\n", fdata, res_str[result]);
-
-	return result;
-}
-
-int PARAM_setRegenResistPower(union32_st value)
-{
-	uint32_t ldata = value.l;
-	int result;
-
-	if(MAIN_isSystemEnabled()) return 1;
-
-	result = REGEN_setRegenResistancePower((uint16_t)ldata);
-	UARTprintf("set regen power %d W is %s\n", (int)ldata, res_str[result]);
-
-	return result;
-}
-#endif
 
 int PARAM_setRegenDuty(union32_st value)
 {

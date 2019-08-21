@@ -1,13 +1,6 @@
 /*
  * drive.c
  *
- * 		support 3 types of input
- *		1. potentiometer : 0 ~ 10V
- *		2. voltage input : 0 ~ 10V
- *		3. current input : 0 ~ 20mA
- *
- *		support 1 output can be voltage, current, frequency
- *
  *  Created on: 2017. 4. 5.
  *      Author: hrjung
  */
@@ -141,17 +134,6 @@ void DRV_enableFocControl(void)
 	//iparam[VF_FOC_SEL_INDEX].value.l = FOC_CONTROL;
 }
 
-#if 0
-int DRV_setTorqueLimit(float_t limit)
-{
-	if(limit < 100.0 || limit > 220.0) return 0;
-
-	iparam[FOC_TORQUE_LIMIT_INDEX].value.f = limit;
-
-	return 0;
-}
-#endif
-
 int DRV_setEnergySave(int method)
 {
 	if(method < ESAVE_UNUSED || method > ESAVE_BOTH) return 1;
@@ -161,20 +143,6 @@ int DRV_setEnergySave(int method)
 	return 0;
 }
 
-#if 0
-int DRV_setVoltageBoost(float_t value)
-{
-	if(value < 0.0 || value > 15.0) return 1;
-
-	if(MAIN_isSystemEnabled()) return 1; // cannot update during motor running
-
-	iparam[V_BOOST_INDEX].value.f = value;
-
-	MAIN_applyBoost();
-
-	return 0;
-}
-#endif
 
 int DRV_setPwmFrequency(int value)
 {
@@ -194,26 +162,6 @@ int DRV_setPwmFrequency(int value)
 
 	return 0;
 }
-
-#if 0
-int DRV_setSpdGainP(float_t value)
-{
-	if(value < 0.0 || value > 32767.0) return 1;
-
-	param.ctrl.spd_P_gain = value; //
-
-	return 0;
-}
-
-int DRV_setSpdGainI(float_t value)
-{
-	if(value < 0.0 || value > 32767.0) return 1;
-
-	param.ctrl.spd_I_gain = value; //
-
-	return 0;
-}
-#endif
 
 float_t DRV_getPwmFrequency(void)
 {
