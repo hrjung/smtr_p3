@@ -88,6 +88,7 @@ extern int TEMP_monitorTemperature(void);
 uint16_t wd_count=0;
 
 #ifdef SUPPORT_PRODUCTION_TEST_MODE
+uint16_t mcu_err=0;
 extern uint16_t production_test_mode_f;
 #endif
 
@@ -428,15 +429,23 @@ interrupt void timer0ISR(void)
 		temp_flag=0;
 
 	// read MCU error
-#if 0
-	if(gTimerCount%30 == 0 && secCnt > 50) // every 30 ms, delay 5 sec
+#ifdef SUPPORT_PRODUCTION_TEST_MODE
+	if(production_test_mode_f)
 	{
-	    if(UTIL_isMcuError())
+	    if(gTimerCount%30 == 0 && secCnt > 50)
+	        mcu_err = UTIL_isMcuError();
+	}
+	else
+#endif
+	{
+	    if(gTimerCount%30 == 0 && secCnt > 50) // every 30 ms, delay 5 sec
 	    {
-	        ERR_setTripFlag(TRIP_REASON_MCU_ERR);
+	        if(UTIL_isMcuError())
+	        {
+	            ERR_setTripFlag(TRIP_REASON_MCU_ERR);
+	        }
 	    }
 	}
-#endif
 
 #ifdef SUPPORT_MISS_PHASE_DETECT
 	if(MAIN_isSystemEnabled())

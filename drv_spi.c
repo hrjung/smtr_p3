@@ -46,6 +46,7 @@ uint16_t spi_checksum=0;
 uint16_t spi_rcv_cmd=0;
 
 #ifdef SUPPORT_PRODUCTION_TEST_MODE
+extern uint16_t mcu_err;
 extern uint16_t production_test_mode_f;
 #endif
 
@@ -241,26 +242,66 @@ inline void SPI_makeResponse(uint16_t seq_no, uint16_t resp)
 }
 
 // command for production test or additional command
-inline void SPI_handleTestCommand(uint16_t cmd)
+inline uint16_t SPI_handleTestCommand(uint16_t cmd)
 {
+    uint16_t cmd_err=0;
+
     switch(cmd)
     {
-    case SPI_TEST_CMD_TEST_MODE:
-#ifdef SUPPORT_PRODUCTION_TEST_MODE
-        production_test_mode_f = 1;
-#endif
-        break;
-
     case SPI_TEST_CMD_RESET:
         reset_requested_f = 1;
         break;
+
+#ifdef SUPPORT_PRODUCTION_TEST_MODE
+    case SPI_TEST_CMD_TEST_MODE:
+        production_test_mode_f = 1;
+        break;
+
+    case SPI_TEST_CMD_SPI_TEST: // valid command, just return ACK
+        break;
+
+    case SPI_TEST_CMD_DTM0_READ: // set DTM pin 00
+        HAL_setGpioLow(halHandle,(GPIO_Number_e)HAL_Gpio_MCU_NOTI0);
+        HAL_setGpioLow(halHandle,(GPIO_Number_e)HAL_Gpio_MCU_NOTI1);
+        break;
+
+    case SPI_TEST_CMD_DTM1_READ: // set DTM pin 01
+        HAL_setGpioHigh(halHandle,(GPIO_Number_e)HAL_Gpio_MCU_NOTI0);
+        HAL_setGpioLow(halHandle,(GPIO_Number_e)HAL_Gpio_MCU_NOTI1);
+        break;
+
+    case SPI_TEST_CMD_DTM2_READ: // set DTM pin 10
+        HAL_setGpioLow(halHandle,(GPIO_Number_e)HAL_Gpio_MCU_NOTI0);
+        HAL_setGpioHigh(halHandle,(GPIO_Number_e)HAL_Gpio_MCU_NOTI1);
+        break;
+
+    case SPI_TEST_CMD_DTM3_READ: // set DTM pin 11
+        HAL_setGpioHigh(halHandle,(GPIO_Number_e)HAL_Gpio_MCU_NOTI0);
+        HAL_setGpioHigh(halHandle,(GPIO_Number_e)HAL_Gpio_MCU_NOTI1);
+        break;
+
+    case SPI_TEST_CMD_MTD_READ:
+        if(mcu_err) // MTD pin
+            HAL_setGpioHigh(halHandle,(GPIO_Number_e)HAL_Gpio_MCU_NOTI0);
+        else
+            HAL_setGpioLow(halHandle,(GPIO_Number_e)HAL_Gpio_MCU_NOTI0);
+        HAL_setGpioLow(halHandle,(GPIO_Number_e)HAL_Gpio_MCU_NOTI1);
+        break;
+#endif
+    default: // unrecognized command
+        cmd_err = 1;
+        break;
     }
+
+    if(cmd_err) return 0;
+
+    return 1;
 }
 
 interrupt void spiARxISR(void)
 {
 	HAL_Obj *obj = (HAL_Obj *)halHandle;
-	uint16_t i, data, seq_no, cmd, checksum=0;
+	uint16_t i, data, seq_no, cmd, checksum=0, res=0;
 	cmd_type_st que_data;
 
 	data = SPI_read(halHandle->spiAHandle);
@@ -351,8 +392,11 @@ interrupt void spiARxISR(void)
 						break;
 
 					case SPICMD_TEST_CMD:
-					    SPI_handleTestCommand(spiRx.buf[5]);
-					    SPI_makeResponse(seq_no, SPI_ACK);
+					    res = SPI_handleTestCommand(spiRx.buf[5]);
+					    if(res)
+					        SPI_makeResponse(seq_no, SPI_ACK);
+					    else
+					        spi_chk_ok=0;
 					    break;
 					}
 				}

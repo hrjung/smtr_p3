@@ -63,6 +63,12 @@ extern "C"
 // test mode command
 #define SPI_TEST_CMD_TEST_MODE  0
 #define SPI_TEST_CMD_RESET      1
+#define SPI_TEST_CMD_SPI_TEST   2   // SPI test command
+#define SPI_TEST_CMD_DTM0_READ  3   // set DTM pin as 00
+#define SPI_TEST_CMD_DTM1_READ  4   // set DTM pin as 01
+#define SPI_TEST_CMD_DTM2_READ  5   // set DTM pin as 10
+#define SPI_TEST_CMD_DTM3_READ  6   // set DTM pin as 11
+#define SPI_TEST_CMD_MTD_READ   7
 
 //*****************************************************************************
 //
