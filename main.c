@@ -416,11 +416,19 @@ uint16_t MAIN_isRunState(void)
 	return (uint16_t)(state_param.run != STOP);
 }
 
+#if 1
+uint16_t MAIN_getDirection(void)
+{
+    if(m_status.direction == REVERSE) return 1;
+    else    return 0;
+}
+#else
 uint16_t MAIN_getDirection(void)
 {
 	if(direction == 1.0) return 0;
 	else return 1;
 }
+#endif
 
 STATIC _iq MAIN_getActualSpeedWithDirection(void)
 {

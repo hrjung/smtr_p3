@@ -569,7 +569,7 @@ STATIC void dbg_showMonitorParam(void)
 //	UARTprintf("\t RMS Vppu: %f, Vppv: %f, Vppw: %f\n", (float)internal_status.Vpprms[0], (float)internal_status.Vpprms[1], (float)internal_status.Vpprms[2]);
 	UARTprintf("\t Volt: Vu: %f, Vv: %f, Vw: %f \n", internal_status.Vu_inst, internal_status.Vv_inst, internal_status.Vw_inst); //, MAIN_getDC_lfp());
 //	UARTprintf("\t Volt: U-V: %f, V-W: %f, W-U: %f \n", (internal_status.Vu_inst - internal_status.Vv_inst), (internal_status.Vv_inst-internal_status.Vw_inst), (internal_status.Vw_inst-internal_status.Vu_inst));
-	UARTprintf("\t Motor RPM: %f  Freq: %f,  target %f, dir=%d \n", STA_getCurSpeed(), m_status.cur_freq, m_status.target_freq, (int)m_status.direction);
+	UARTprintf("\t Motor RPM: %f  Freq: %f,  target %f, dir=%d \n", STA_getCurSpeed(), m_status.cur_freq, m_status.target_freq, (int)MAIN_getDirection());
 	UARTprintf("\t Motor status %d, accel: %f  decel: %f \n", m_status.status, m_status.acc_res, m_status.dec_res);
 //	UARTprintf("\t Motor status %d, accel: %f  decel: %f gOver=%f \n", m_status.status, m_status.acc_res, m_status.dec_res, gOver);
 }
